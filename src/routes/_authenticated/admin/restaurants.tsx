@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_authenticated/admin/restaurants")({
 type Restaurant = {
   id: string; name: string; description: string | null; image_url: string | null;
   cuisine: string | null; rating: number; delivery_time_min: number; min_order: number; is_open: boolean;
+  owner_id: string | null;
 };
 type MenuItem = {
   id: string; restaurant_id: string; name: string; description: string | null;
