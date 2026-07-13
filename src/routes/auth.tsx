@@ -36,7 +36,27 @@ function AuthPage() {
   const [referralCode, setReferralCode] = useState((search.ref ?? "").toUpperCase());
   const [loading, setLoading] = useState(false);
 
-  const redirectTo = search.redirect ?? "/parcel";
+  const redirectTo = search.redirect;
+
+  async function landingForCurrentUser(): Promise<string> {
+    if (redirectTo) return redirectTo;
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) return "/";
+      const [{ data: isAdmin }, { data: isRider }, { data: isOwner }] = await Promise.all([
+        supabase.rpc("has_role", { _user_id: uid, _role: "admin" }),
+        supabase.rpc("has_role", { _user_id: uid, _role: "rider" }),
+        supabase.rpc("has_role", { _user_id: uid, _role: "restaurant" }),
+      ]);
+      if (isAdmin) return "/admin";
+      if (isOwner) return "/restaurant-hub";
+      if (isRider) return "/rider-hub";
+      return "/";
+    } catch {
+      return "/";
+    }
+  }
 
   async function attachReferralIfAny() {
     const code = referralCode.trim().toUpperCase();
@@ -68,7 +88,7 @@ function AuthPage() {
         if (error) throw error;
         await attachReferralIfAny();
         toast.success("অ্যাকাউন্ট তৈরি হয়েছে!");
-        navigate({ to: redirectTo });
+        navigate({ to: await landingForCurrentUser() });
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: parsed.data.email,
@@ -77,7 +97,7 @@ function AuthPage() {
         if (error) throw error;
         await attachReferralIfAny();
         toast.success("স্বাগতম!");
-        navigate({ to: redirectTo });
+        navigate({ to: await landingForCurrentUser() });
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "ভুল হয়েছে");
@@ -99,7 +119,7 @@ function AuthPage() {
       }
       if (result.redirected) return;
       toast.success("স্বাগতম!");
-      navigate({ to: redirectTo });
+      navigate({ to: await landingForCurrentUser() });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Google লগইন ব্যর্থ");
       setLoading(false);
