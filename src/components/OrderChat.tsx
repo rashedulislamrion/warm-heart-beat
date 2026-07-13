@@ -126,6 +126,7 @@ export function OrderChat({
     setSending(false);
     if (error) return toast.error(error.message);
     setText("");
+    playSendChime();
     setMsgs((prev) => {
       const row = data as unknown as Msg;
       if (!prev) return [row];
