@@ -266,14 +266,16 @@ function RiderHub() {
                 <>
                   {myActiveParcels.map((p) => (
                     <ActiveParcel key={p.id} p={p} busy={busy === p.id}
+                      unread={countFor("parcel", p.id)}
                       onNext={(next) => updateParcelStatus(p, next)}
-                      onChat={() => setChat({ type: "parcel", id: p.id, code: p.order_code })}
+                      onChat={() => openChat({ type: "parcel", id: p.id, code: p.order_code })}
                     />
                   ))}
                   {myActiveFoods.map((f) => (
                     <ActiveFood key={f.id} f={f} busy={busy === f.id}
+                      unread={countFor("food", f.id)}
                       onNext={(next) => updateFoodStatus(f, next)}
-                      onChat={() => setChat({ type: "food", id: f.id, code: f.order_code })}
+                      onChat={() => openChat({ type: "food", id: f.id, code: f.order_code })}
                     />
                   ))}
                 </>
