@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/restaurant-hub")({
 type Restaurant = {
   id: string; name: string; description: string | null; image_url: string | null;
   cuisine: string | null; delivery_time_min: number; min_order: number; is_open: boolean;
-  open_time: string | null; close_time: string | null;
+  open_time: string | null; close_time: string | null; location: string;
 };
 type MenuItem = {
   id: string; restaurant_id: string; name: string; description: string | null;
