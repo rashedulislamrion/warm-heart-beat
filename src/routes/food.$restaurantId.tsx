@@ -10,11 +10,12 @@ import { ArrowLeft, Star, Clock, Plus, Minus, ShoppingBag } from "lucide-react";
 import { cart, useCart, cartCount, cartTotal, type CartItem } from "@/lib/cart";
 
 export const Route = createFileRoute("/food/$restaurantId")({
-  head: ({ loaderData }) => ({
-    meta: [
-      { title: loaderData ? `${loaderData.name} — পায়রা` : "রেস্টুরেন্ট — পায়রা" },
-    ],
-  }),
+  head: ({ loaderData }) => {
+    const d = loaderData as { name?: string } | undefined;
+    return {
+      meta: [{ title: d?.name ? `${d.name} — পায়রা` : "রেস্টুরেন্ট — পায়রা" }],
+    };
+  },
   loader: async ({ params }) => {
     const { data } = await supabase
       .from("restaurants")
