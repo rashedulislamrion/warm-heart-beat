@@ -126,7 +126,10 @@ function OrdersPage() {
       </header>
 
       <div className="mx-auto mt-6 max-w-3xl px-4">
-        <h1 className="font-bangla text-2xl font-extrabold">আমার অর্ডার</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-bangla text-2xl font-extrabold">আমার অর্ডার</h1>
+          <PushNotificationToggle />
+        </div>
 
         <div className="mt-4 inline-flex rounded-full bg-secondary p-1">
           {(["parcel", "food"] as Tab[]).map((t) => (
