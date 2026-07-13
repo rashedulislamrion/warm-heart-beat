@@ -105,7 +105,10 @@ function FoodIndex() {
                     )}
                     <div className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[11px] font-bold text-foreground shadow-soft">
                       <Star className="h-3 w-3 fill-accent text-accent" />
-                      {r.rating.toFixed(1)}
+                      {(ratings[r.id]?.avg ?? r.rating).toFixed(1)}
+                      {ratings[r.id]?.count ? (
+                        <span className="ml-0.5 font-normal text-muted-foreground">({ratings[r.id]!.count})</span>
+                      ) : null}
                     </div>
                   </div>
                   <div className="p-4">
