@@ -8,6 +8,7 @@ import { OrderChat } from "@/components/OrderChat";
 import { toast } from "sonner";
 import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search, MessageCircle, Bike, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDashboard,
