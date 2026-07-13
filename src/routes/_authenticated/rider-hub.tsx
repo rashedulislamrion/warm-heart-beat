@@ -296,6 +296,7 @@ function RiderHub() {
                     <ActiveParcel key={p.id} p={p} busy={busy === p.id}
                       unread={countFor("parcel", p.id)}
                       onNext={(next) => updateParcelStatus(p, next)}
+                      onRelease={() => releaseParcel(p)}
                       onChat={() => openChat({ type: "parcel", id: p.id, code: p.order_code })}
                     />
                   ))}
@@ -303,6 +304,7 @@ function RiderHub() {
                     <ActiveFood key={f.id} f={f} busy={busy === f.id}
                       unread={countFor("food", f.id)}
                       onNext={(next) => updateFoodStatus(f, next)}
+                      onRelease={() => releaseFood(f)}
                       onChat={() => openChat({ type: "food", id: f.id, code: f.order_code })}
                     />
                   ))}
