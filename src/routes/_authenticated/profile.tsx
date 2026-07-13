@@ -22,6 +22,7 @@ function ProfilePage() {
   const [profile, setProfile] = useState<any>(undefined);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isRider, setIsRider] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()
@@ -30,6 +31,8 @@ function ProfilePage() {
       .then(({ data }) => setIsAdmin(Boolean(data)));
     supabase.rpc("has_role", { _user_id: user.id, _role: "rider" })
       .then(({ data }) => setIsRider(Boolean(data)));
+    supabase.rpc("has_role", { _user_id: user.id, _role: "restaurant" })
+      .then(({ data }) => setIsOwner(Boolean(data)));
   }, [user.id]);
 
   async function signOut() {
