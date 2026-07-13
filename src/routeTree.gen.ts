@@ -25,6 +25,7 @@ import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminRidersRouteImport } from './routes/_authenticated/admin/riders'
 import { Route as AuthenticatedAdminRestaurantsRouteImport } from './routes/_authenticated/admin/restaurants'
+import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
@@ -108,6 +109,12 @@ const AuthenticatedAdminRestaurantsRoute =
     path: '/restaurants',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminAnalyticsRoute =
+  AuthenticatedAdminAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/profile-setup': typeof AuthenticatedProfileSetupRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/admin/riders': typeof AuthenticatedAdminRidersRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -138,6 +146,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/profile-setup': typeof AuthenticatedProfileSetupRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/admin/riders': typeof AuthenticatedAdminRidersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -157,6 +166,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/profile-setup': typeof AuthenticatedProfileSetupRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
+  '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/_authenticated/admin/riders': typeof AuthenticatedAdminRidersRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/profile-setup'
     | '/food/$restaurantId'
+    | '/admin/analytics'
     | '/admin/restaurants'
     | '/admin/riders'
     | '/admin/'
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/profile-setup'
     | '/food/$restaurantId'
+    | '/admin/analytics'
     | '/admin/restaurants'
     | '/admin/riders'
     | '/admin'
@@ -210,6 +222,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/profile-setup'
     | '/food/$restaurantId'
+    | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/restaurants'
     | '/_authenticated/admin/riders'
     | '/_authenticated/admin/'
@@ -338,10 +351,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRestaurantsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/analytics': {
+      id: '/_authenticated/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminRestaurantsRoute: typeof AuthenticatedAdminRestaurantsRoute
   AuthenticatedAdminRidersRoute: typeof AuthenticatedAdminRidersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -349,6 +370,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminRestaurantsRoute: AuthenticatedAdminRestaurantsRoute,
     AuthenticatedAdminRidersRoute: AuthenticatedAdminRidersRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
