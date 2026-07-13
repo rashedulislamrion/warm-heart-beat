@@ -92,6 +92,21 @@ function ProfilePage() {
             </Link>
 
             <Link
+              to="/notifications"
+              className="mt-3 inline-flex w-full items-center justify-between gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm font-semibold hover:bg-secondary"
+            >
+              <span className="flex items-center gap-2">
+                <Bell className="h-4 w-4" />
+                <span className="font-bangla">নোটিফিকেশন</span>
+              </span>
+              {unread > 0 && (
+                <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+                  {unread}
+                </span>
+              )}
+            </Link>
+
+            <Link
               to="/wallet"
               className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm font-semibold hover:bg-secondary"
             >
