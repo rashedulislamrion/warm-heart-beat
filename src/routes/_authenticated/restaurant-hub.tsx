@@ -169,7 +169,9 @@ function OrdersTab({ restaurantId }: { restaurantId: string }) {
     if (!window.confirm(`অর্ডার ${o.order_code} বাতিল করবেন?`)) return;
     const { error } = await supabase.from("food_orders").update({ status: "cancelled" as any }).eq("id", o.id);
     if (error) return toast.error(error.message);
-    toast.success("বাতিল হয়েছে");
+    const { data: refund } = await (supabase.rpc as any)("refund_order", { _order_type: "food", _order_id: o.id });
+    const credits = Array.isArray(refund) ? Number(refund[0]?.credits_refunded ?? 0) : 0;
+    toast.success(credits > 0 ? `বাতিল · ৳${credits} ক্রেডিট ফেরত` : "বাতিল হয়েছে");
     load();
   }
 
