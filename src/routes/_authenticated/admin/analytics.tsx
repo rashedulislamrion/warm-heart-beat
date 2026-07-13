@@ -21,16 +21,20 @@ export const Route = createFileRoute("/_authenticated/admin/analytics")({
   component: AnalyticsPage,
 });
 
-type Parcel = { id: string; delivery_charge: number; status: string; created_at: string };
+type Parcel = { id: string; delivery_charge: number; status: string; created_at: string; updated_at: string; rider_id: string | null };
 type FoodOrder = {
   id: string;
   total: number;
   status: string;
   created_at: string;
+  updated_at: string;
   restaurant_id: string | null;
+  rider_id: string | null;
   items: any;
 };
 type Restaurant = { id: string; name: string };
+type Review = { rider_id: string | null; rider_rating: number | null };
+type Profile = { id: string; full_name: string | null };
 
 const RANGE_OPTIONS = [
   { key: "7", label: "৭ দিন" },
