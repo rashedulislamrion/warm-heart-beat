@@ -209,6 +209,7 @@ function OrdersPage() {
                     statusLabel={s.label}
                     statusClass={s.className}
                     amount={r.delivery_charge}
+                    scheduledFor={r.scheduled_for}
                     footer={
                       (canChat || canRate || rated) ? (
                         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -271,6 +272,7 @@ function OrdersPage() {
                   statusLabel={s.label}
                   statusClass={s.className}
                   amount={r.total}
+                  scheduledFor={r.scheduled_for}
                   accent
                   footer={
                     <div className="mt-3 flex flex-wrap items-center gap-2">
