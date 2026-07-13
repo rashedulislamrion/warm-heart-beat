@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { OrderChat } from "@/components/OrderChat";
 import { toast } from "sonner";
-import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search, MessageCircle, UserPlus, Check } from "lucide-react";
+import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search, MessageCircle, Bike, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
@@ -41,20 +41,31 @@ const statusColor: Record<string, string> = {
 
 type Tab = "parcel" | "food";
 
+type Rider = { id: string; full_name: string | null; phone: string | null };
+
 function AdminDashboard() {
   const { user } = Route.useRouteContext();
   const [tab, setTab] = useState<Tab>("parcel");
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
+  const [riders, setRiders] = useState<Rider[]>([]);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
 
-  async function assignSelf(orderType: "food" | "parcel", id: string) {
+  async function assignRider(orderType: "food" | "parcel", id: string, riderId: string | null) {
     const table = orderType === "parcel" ? "parcels" : "food_orders";
-    const { error } = await supabase.from(table).update({ rider_id: user.id }).eq("id", id);
+    const patch: any = { rider_id: riderId };
+    if (orderType === "parcel" && riderId) patch.status = "rider_assigned";
+    const { error } = await supabase.from(table).update(patch).eq("id", id);
     if (error) return toast.error(error.message);
-    toast.success("আপনি রাইডার হিসেবে যুক্ত হয়েছেন");
+    toast.success(riderId ? "রাইডার অ্যাসাইন হয়েছে" : "রাইডার সরানো হয়েছে");
+  }
+
+  function riderLabel(riderId: string | null) {
+    if (!riderId) return "রাইডার নেই";
+    const r = riders.find((x) => x.id === riderId);
+    return r?.full_name || r?.phone || "রাইডার";
   }
 
   useEffect(() => {
@@ -62,6 +73,14 @@ function AdminDashboard() {
       .then(({ data }) => setParcels((data as Parcel[]) ?? []));
     supabase.from("food_orders").select("*").order("created_at", { ascending: false }).limit(200)
       .then(({ data }) => setFoods((data as FoodOrder[]) ?? []));
+
+    (async () => {
+      const { data: roles } = await supabase.from("user_roles").select("user_id").eq("role", "rider");
+      const ids = (roles ?? []).map((r: any) => r.user_id);
+      if (ids.length === 0) { setRiders([]); return; }
+      const { data: profs } = await supabase.from("profiles").select("id, full_name, phone").in("id", ids);
+      setRiders((profs as Rider[]) ?? []);
+    })();
 
     const ch1 = supabase
       .channel("admin-parcels")
@@ -234,14 +253,13 @@ function AdminDashboard() {
                     >
                       <MessageCircle className="h-4 w-4" />
                     </button>
-                    <button
-                      onClick={() => assignSelf("parcel", r.id)}
-                      disabled={r.rider_id === user.id}
-                      className="inline-flex h-9 items-center gap-1 rounded-lg border border-border px-2 text-xs disabled:opacity-60"
-                    >
-                      {r.rider_id === user.id ? <Check className="h-3.5 w-3.5" /> : <UserPlus className="h-3.5 w-3.5" />}
-                      <span className="font-bangla">{r.rider_id === user.id ? "নিয়োগ" : "নিন"}</span>
-                    </button>
+                    <RiderAssign
+                      riders={riders}
+                      value={r.rider_id}
+                      onChange={(v) => assignRider("parcel", r.id, v)}
+                      label={riderLabel(r.rider_id)}
+                    />
+
                     <Select value={r.status} onValueChange={(v) => updateParcelStatus(r.id, v)}>
                       <SelectTrigger className="h-9 w-40 rounded-lg text-xs">
                         <SelectValue />
@@ -290,14 +308,13 @@ function AdminDashboard() {
                     >
                       <MessageCircle className="h-4 w-4" />
                     </button>
-                    <button
-                      onClick={() => assignSelf("food", r.id)}
-                      disabled={r.rider_id === user.id}
-                      className="inline-flex h-9 items-center gap-1 rounded-lg border border-border px-2 text-xs disabled:opacity-60"
-                    >
-                      {r.rider_id === user.id ? <Check className="h-3.5 w-3.5" /> : <UserPlus className="h-3.5 w-3.5" />}
-                      <span className="font-bangla">{r.rider_id === user.id ? "নিয়োগ" : "নিন"}</span>
-                    </button>
+                    <RiderAssign
+                      riders={riders}
+                      value={r.rider_id}
+                      onChange={(v) => assignRider("food", r.id, v)}
+                      label={riderLabel(r.rider_id)}
+                    />
+
                     <Select value={r.status} onValueChange={(v) => updateFoodStatus(r.id, v)}>
                       <SelectTrigger className="h-9 w-40 rounded-lg text-xs">
                         <SelectValue />
@@ -364,6 +381,49 @@ function StatCard({
         <div className="font-bangla text-xs text-muted-foreground">{label}</div>
       </div>
       <div className="mt-2 text-2xl font-extrabold">{value}</div>
+    </div>
+  );
+}
+
+function RiderAssign({
+  riders, value, onChange, label,
+}: {
+  riders: Rider[];
+  value: string | null;
+  onChange: (v: string | null) => void;
+  label: string;
+}) {
+  return (
+    <div className="flex items-center gap-1">
+      <Select value={value ?? "__none__"} onValueChange={(v) => onChange(v === "__none__" ? null : v)}>
+        <SelectTrigger className="h-9 w-44 rounded-lg text-xs">
+          <span className="inline-flex items-center gap-1 truncate">
+            <Bike className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate font-bangla">{label}</span>
+          </span>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="__none__">— রাইডার নেই —</SelectItem>
+          {riders.length === 0 ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">অনুমোদিত রাইডার নেই</div>
+          ) : (
+            riders.map((r) => (
+              <SelectItem key={r.id} value={r.id}>
+                {(r.full_name || "নামহীন") + (r.phone ? ` · ${r.phone}` : "")}
+              </SelectItem>
+            ))
+          )}
+        </SelectContent>
+      </Select>
+      {value && (
+        <button
+          onClick={() => onChange(null)}
+          className="grid h-9 w-9 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted"
+          aria-label="আনঅ্যাসাইন"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      )}
     </div>
   );
 }
