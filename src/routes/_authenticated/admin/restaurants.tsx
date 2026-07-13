@@ -348,3 +348,59 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </div>
   );
 }
+
+function AssignOwnerDialog({
+  children, restaurant, onSaved,
+}: { children: React.ReactNode; restaurant: Restaurant; onSaved: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [ownerName, setOwnerName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open && restaurant.owner_id) {
+      supabase.from("profiles").select("full_name, phone").eq("id", restaurant.owner_id).maybeSingle()
+        .then(({ data }) => setOwnerName(data ? `${data.full_name ?? ""} (${data.phone ?? ""})` : null));
+    } else {
+      setOwnerName(null);
+      setPhone("");
+    }
+  }, [open, restaurant.owner_id]);
+
+  async function assign() {
+    const p = phone.trim();
+    if (!p) return toast.error("ফোন দিন");
+    setSaving(true);
+    const { data: prof, error: e1 } = await supabase.from("profiles").select("id, full_name").eq("phone", p).maybeSingle();
+    if (e1 || !prof) { setSaving(false); return toast.error("এই ফোনে কোনো ব্যবহারকারী নেই"); }
+    const { error } = await supabase.rpc("assign_restaurant_owner", { _restaurant_id: restaurant.id, _user_id: prof.id });
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success(`${prof.full_name ?? "user"} কে মালিক হিসেবে বরাদ্দ করা হলো`);
+    setOpen(false);
+    onSaved();
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>রেস্টুরেন্ট মালিক বরাদ্দ</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div className="text-xs text-muted-foreground">
+            বর্তমান মালিক: <span className="font-semibold text-foreground">{ownerName ?? "কেউ নেই"}</span>
+          </div>
+          <Field label="ব্যবহারকারীর ফোন নম্বর">
+            <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+8801..." />
+          </Field>
+          <p className="text-xs text-muted-foreground">
+            নির্বাচিত ব্যবহারকারী "restaurant" রোল পাবেন এবং /restaurant-hub এ অ্যাক্সেস পাবেন।
+          </p>
+          <Button onClick={assign} disabled={saving} className="w-full gradient-primary text-primary-foreground">
+            {saving ? "সেভ হচ্ছে..." : "বরাদ্দ করুন"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
