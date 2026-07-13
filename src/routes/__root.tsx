@@ -115,8 +115,13 @@ function RootComponent() {
   }, [queryClient, router]);
 
   return (
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <div key={pathname} className="animate-page-in">
+        <Outlet />
+      </div>
       <OrderStatusListener />
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
