@@ -169,6 +169,7 @@ function OrdersPage() {
               if (filtered.length === 0) return <p className="py-10 text-center font-bangla text-sm text-muted-foreground">কিছু পাওয়া যায়নি</p>;
               return filtered.map((r) => {
                 const s = parcelStatus[r.status] ?? parcelStatus.pending!;
+                const canChat = r.status !== "cancelled" && r.status !== "delivered";
                 return (
                   <Card
                     key={r.id}
@@ -179,6 +180,19 @@ function OrdersPage() {
                     statusLabel={s.label}
                     statusClass={s.className}
                     amount={r.delivery_charge}
+                    footer={
+                      canChat ? (
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <button
+                            onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
+                          >
+                            <MessageCircle className="h-3.5 w-3.5" />
+                            <span className="font-bangla">রাইডার চ্যাট</span>
+                          </button>
+                        </div>
+                      ) : null
+                    }
                   />
                 );
               });
