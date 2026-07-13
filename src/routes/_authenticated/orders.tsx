@@ -68,6 +68,12 @@ function OrdersPage() {
   const [q, setQ] = useState("");
   const [reordering, setReordering] = useState<string | null>(null);
   const [chat, setChat] = useState<ChatTarget | null>(null);
+  const { countFor, clearFor, unmute } = useUnreadMessages(user.id);
+
+  function openChat(target: ChatTarget) {
+    clearFor(target.type, target.id);
+    setChat(target);
+  }
 
   useEffect(() => {
     supabase.from("parcels")
