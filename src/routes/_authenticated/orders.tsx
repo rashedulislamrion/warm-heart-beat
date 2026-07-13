@@ -5,7 +5,9 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Package, ArrowLeft, Inbox, UtensilsCrossed } from "lucide-react";
+import { Package, ArrowLeft, Inbox, UtensilsCrossed, Star } from "lucide-react";
+import { StarDisplay } from "@/components/Stars";
+import { ReviewDialog } from "@/components/ReviewDialog";
 
 export const Route = createFileRoute("/_authenticated/orders")({
   head: () => ({ meta: [{ title: "আমার অর্ডার — পায়রা" }] }),
@@ -18,8 +20,10 @@ type Parcel = {
 };
 type FoodOrder = {
   id: string; order_code: string; status: string; total: number;
-  receiver_hall: string; created_at: string;
+  receiver_hall: string; restaurant_id: string | null; created_at: string;
 };
+
+type ReviewRow = { order_id: string; rating: number };
 
 const parcelStatus: Record<string, { label: string; className: string }> = {
   pending: { label: "অপেক্ষমাণ", className: "bg-muted text-muted-foreground" },
@@ -44,6 +48,8 @@ function OrdersPage() {
   const [tab, setTab] = useState<Tab>("parcel");
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
+  const [ratings, setRatings] = useState<Record<string, number>>({});
+  const [reviewFor, setReviewFor] = useState<FoodOrder | null>(null);
 
   useEffect(() => {
     supabase.from("parcels")
@@ -52,10 +58,18 @@ function OrdersPage() {
       .order("created_at", { ascending: false })
       .then(({ data }) => setParcels((data as Parcel[]) ?? []));
     supabase.from("food_orders")
-      .select("id, order_code, status, total, receiver_hall, created_at")
+      .select("id, order_code, status, total, receiver_hall, restaurant_id, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .then(({ data }) => setFoods((data as FoodOrder[]) ?? []));
+    supabase.from("reviews" as any)
+      .select("order_id, rating")
+      .eq("user_id", user.id)
+      .then(({ data }) => {
+        const map: Record<string, number> = {};
+        ((data ?? []) as unknown as ReviewRow[]).forEach((r) => { map[r.order_id] = r.rating; });
+        setRatings(map);
+      });
   }, [user.id]);
 
   return (
@@ -113,6 +127,8 @@ function OrdersPage() {
           ) : (
             foods.map((r) => {
               const s = foodStatus[r.status] ?? foodStatus.pending!;
+              const rated = ratings[r.id];
+              const canRate = r.status === "delivered" && !rated;
               return (
                 <Card
                   key={r.id}
@@ -124,12 +140,42 @@ function OrdersPage() {
                   statusClass={s.className}
                   amount={r.total}
                   accent
+                  footer={
+                    canRate ? (
+                      <button
+                        onClick={() => setReviewFor(r)}
+                        className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
+                      >
+                        <Star className="h-3.5 w-3.5" />
+                        <span className="font-bangla">রিভিউ দিন</span>
+                      </button>
+                    ) : rated ? (
+                      <div className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground">
+                        <StarDisplay value={rated} size={13} />
+                        <span className="font-bangla">আপনার রেটিং</span>
+                      </div>
+                    ) : null
+                  }
                 />
               );
             })
           )}
         </div>
       </div>
+
+      {reviewFor && (
+        <ReviewDialog
+          open={!!reviewFor}
+          onOpenChange={(v) => { if (!v) setReviewFor(null); }}
+          orderId={reviewFor.id}
+          orderCode={reviewFor.order_code}
+          restaurantId={reviewFor.restaurant_id}
+          onSubmitted={({ rating }) => {
+            setRatings((m) => ({ ...m, [reviewFor.id]: rating }));
+            setReviewFor(null);
+          }}
+        />
+      )}
 
       <FloatingActions />
       <MobileBottomNav />
@@ -138,10 +184,11 @@ function OrdersPage() {
 }
 
 function Card({
-  icon, title, subtitle, date, statusLabel, statusClass, amount, accent,
+  icon, title, subtitle, date, statusLabel, statusClass, amount, accent, footer,
 }: {
   icon: React.ReactNode; title: string; subtitle: string; date: string;
   statusLabel: string; statusClass: string; amount: number; accent?: boolean;
+  footer?: React.ReactNode;
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
@@ -165,6 +212,7 @@ function Card({
           <div className="mt-1 text-sm font-bold text-primary">৳{amount}</div>
         </div>
       </div>
+      {footer}
     </div>
   );
 }
