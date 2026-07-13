@@ -50,6 +50,13 @@ type MenuItem = {
   is_available: boolean;
 };
 
+type Review = {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+};
+
 function RestaurantPage() {
   const r = Route.useLoaderData();
   const [menu, setMenu] = useState<MenuItem[] | null>(null);
