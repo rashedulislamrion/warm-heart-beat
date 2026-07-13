@@ -174,6 +174,36 @@ function AnalyticsPage() {
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
 
+    // Top riders: delivered order counts + avg rating
+    const riderMap = new Map<string, { id: string; delivered: number; earnings: number }>();
+    p.filter((r) => r.status === "delivered" && r.rider_id).forEach((r) => {
+      const cur = riderMap.get(r.rider_id!) ?? { id: r.rider_id!, delivered: 0, earnings: 0 };
+      cur.delivered += 1;
+      cur.earnings += r.delivery_charge || 0;
+      riderMap.set(r.rider_id!, cur);
+    });
+    f.filter((r) => r.status === "delivered" && r.rider_id).forEach((r) => {
+      const cur = riderMap.get(r.rider_id!) ?? { id: r.rider_id!, delivered: 0, earnings: 0 };
+      cur.delivered += 1;
+      cur.earnings += 40;
+      riderMap.set(r.rider_id!, cur);
+    });
+    const ratingMap = new Map<string, { sum: number; count: number }>();
+    (reviews ?? []).forEach((rv) => {
+      if (!rv.rider_id || rv.rider_rating == null) return;
+      const cur = ratingMap.get(rv.rider_id) ?? { sum: 0, count: 0 };
+      cur.sum += rv.rider_rating;
+      cur.count += 1;
+      ratingMap.set(rv.rider_id, cur);
+    });
+    const topRiders = Array.from(riderMap.values())
+      .map((r) => {
+        const rt = ratingMap.get(r.id);
+        return { ...r, rating: rt ? +(rt.sum / rt.count).toFixed(1) : null, reviews: rt?.count ?? 0 };
+      })
+      .sort((a, b) => b.delivered - a.delivered)
+      .slice(0, 5);
+
     const totalRevenue = revenueSeries.reduce((s, r) => s + r.total, 0);
     const totalOrders = p.length + f.length;
     const delivered =
@@ -183,15 +213,36 @@ function AnalyticsPage() {
       p.filter((r) => r.status === "cancelled").length +
       f.filter((r) => r.status === "cancelled").length;
     const aov = totalOrders > 0 ? Math.round(totalRevenue / Math.max(1, totalOrders - cancelled)) : 0;
+    const cancelRate = totalOrders > 0 ? Math.round((cancelled / totalOrders) * 100) : 0;
+
+    // Avg delivery time (mins) for delivered orders
+    const deliveredRows = [
+      ...p.filter((r) => r.status === "delivered"),
+      ...f.filter((r) => r.status === "delivered"),
+    ];
+    const avgDeliveryMin = deliveredRows.length
+      ? Math.round(
+          deliveredRows.reduce(
+            (s, r) => s + (new Date(r.updated_at).getTime() - new Date(r.created_at).getTime()) / 60000,
+            0,
+          ) / deliveredRows.length,
+        )
+      : 0;
+
+    // Avg rider rating overall
+    let sumR = 0, cntR = 0;
+    ratingMap.forEach((v) => { sumR += v.sum; cntR += v.count; });
+    const avgRating = cntR > 0 ? +(sumR / cntR).toFixed(1) : 0;
 
     return {
       revenueSeries,
       hourSeries: hourCounts,
       topItems,
       topRestaurants,
-      kpis: { totalRevenue, totalOrders, delivered, cancelled, aov },
+      topRiders,
+      kpis: { totalRevenue, totalOrders, delivered, cancelled, aov, cancelRate, avgDeliveryMin, avgRating },
     };
-  }, [parcels, foods, range]);
+  }, [parcels, foods, reviews, range]);
 
   const maxHour = Math.max(1, ...hourSeries.map((h) => h.orders));
 
