@@ -384,3 +384,46 @@ function StatCard({
     </div>
   );
 }
+
+function RiderAssign({
+  riders, value, onChange, label,
+}: {
+  riders: Rider[];
+  value: string | null;
+  onChange: (v: string | null) => void;
+  label: string;
+}) {
+  return (
+    <div className="flex items-center gap-1">
+      <Select value={value ?? "__none__"} onValueChange={(v) => onChange(v === "__none__" ? null : v)}>
+        <SelectTrigger className="h-9 w-44 rounded-lg text-xs">
+          <span className="inline-flex items-center gap-1 truncate">
+            <Bike className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate font-bangla">{label}</span>
+          </span>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="__none__">— রাইডার নেই —</SelectItem>
+          {riders.length === 0 ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">অনুমোদিত রাইডার নেই</div>
+          ) : (
+            riders.map((r) => (
+              <SelectItem key={r.id} value={r.id}>
+                {(r.full_name || "নামহীন") + (r.phone ? ` · ${r.phone}` : "")}
+              </SelectItem>
+            ))
+          )}
+        </SelectContent>
+      </Select>
+      {value && (
+        <button
+          onClick={() => onChange(null)}
+          className="grid h-9 w-9 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted"
+          aria-label="আনঅ্যাসাইন"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      )}
+    </div>
+  );
+}
