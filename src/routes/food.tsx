@@ -42,6 +42,9 @@ function FoodLayout() {
 function FoodIndex() {
   const [rows, setRows] = useState<Restaurant[] | null>(null);
   const [ratings, setRatings] = useState<Record<string, { avg: number; count: number }>>({});
+  const [showFavsOnly, setShowFavsOnly] = useState(false);
+  const uid = useCurrentUserId();
+  const { ids: favIds, toggle: toggleFav } = useFavorites(uid);
   const items = useCart();
   const count = cartCount(items);
   const total = cartTotal(items);
