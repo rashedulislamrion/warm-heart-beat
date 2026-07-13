@@ -17,6 +17,7 @@ import {
   OTHER_LOCATIONS,
   calculateDeliveryCharge,
 } from "@/lib/halls";
+import { fireConfetti } from "@/lib/confetti";
 import {
   ArrowLeft, ArrowRight, Check, Package, User, MapPin, Boxes, Wallet,
   FileText, Pill, ShoppingBag, Shirt, Cpu, Loader2, PartyPopper, Share2, Copy,
@@ -151,6 +152,7 @@ function ParcelFlow() {
     setSubmitting(false);
     if (error || !inserted) return toast.error(error?.message ?? "অর্ডার ব্যর্থ");
     setOrderCode(inserted.order_code);
+    fireConfetti();
     toast.success("অর্ডার কনফার্ম হয়েছে! 🎉");
   }
 

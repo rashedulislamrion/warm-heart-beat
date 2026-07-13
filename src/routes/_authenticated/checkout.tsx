@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MALE_HALLS, FEMALE_HALLS, OTHER_LOCATIONS, calculateDeliveryCharge } from "@/lib/halls";
 import { cart, useCart, cartTotal, cartCount } from "@/lib/cart";
+import { fireConfetti } from "@/lib/confetti";
 import { ArrowLeft, Loader2, Minus, Plus, PartyPopper, ShoppingBag, Trash2, Copy } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
@@ -99,6 +100,7 @@ function CheckoutPage() {
     if (error || !data) return toast.error(error?.message ?? "অর্ডার ব্যর্থ");
     cart.clear();
     setOrderCode(data.order_code);
+    fireConfetti();
     toast.success("অর্ডার কনফার্ম হয়েছে! 🎉");
   }
 
