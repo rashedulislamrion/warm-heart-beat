@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { PushNotificationToggle } from "@/components/PushNotificationToggle";
 import { cart } from "@/lib/cart";
 import { toast } from "sonner";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 export const Route = createFileRoute("/_authenticated/orders")({
   head: () => ({ meta: [{ title: "আমার অর্ডার — পায়রা" }] }),
@@ -67,6 +68,12 @@ function OrdersPage() {
   const [q, setQ] = useState("");
   const [reordering, setReordering] = useState<string | null>(null);
   const [chat, setChat] = useState<ChatTarget | null>(null);
+  const { countFor, clearFor, unmute } = useUnreadMessages(user.id);
+
+  function openChat(target: ChatTarget) {
+    clearFor(target.type, target.id);
+    setChat(target);
+  }
 
   useEffect(() => {
     supabase.from("parcels")
@@ -230,11 +237,16 @@ function OrdersPage() {
                           ) : null}
                           {canChat && (
                             <button
-                              onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
-                              className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
+                              onClick={() => openChat({ type: "parcel", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
+                              className="relative inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
                             >
                               <MessageCircle className="h-3.5 w-3.5" />
                               <span className="font-bangla">রাইডার চ্যাট</span>
+                              {countFor("parcel", r.id) > 0 && (
+                                <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                                  {countFor("parcel", r.id)}
+                                </span>
+                              )}
                             </button>
                           )}
                         </div>
@@ -302,11 +314,16 @@ function OrdersPage() {
                       )}
                       {canChat && (
                         <button
-                          onClick={() => setChat({ type: "food", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
+                          onClick={() => openChat({ type: "food", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
+                          className="relative inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
                         >
                           <MessageCircle className="h-3.5 w-3.5" />
                           <span className="font-bangla">রাইডার চ্যাট</span>
+                          {countFor("food", r.id) > 0 && (
+                            <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                              {countFor("food", r.id)}
+                            </span>
+                          )}
                         </button>
                       )}
                     </div>
@@ -335,7 +352,7 @@ function OrdersPage() {
         />
       )}
 
-      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) setChat(null); }}>
+      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) { if (chat) unmute(chat.type, chat.id); setChat(null); } }}>
         <DialogContent className="max-w-md p-0 sm:p-0">
           <DialogHeader className="px-5 pt-5">
             <DialogTitle className="font-bangla">অর্ডার {chat?.code}</DialogTitle>

@@ -4,6 +4,30 @@ import { toast } from "sonner";
 import { Loader2, Send, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+function playSendChime() {
+  try {
+    const AnyWin = window as any;
+    const Ctx = AnyWin.AudioContext || AnyWin.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx: AudioContext = AnyWin.__payraAudioCtx || (AnyWin.__payraAudioCtx = new Ctx());
+    if (ctx.state === "suspended") ctx.resume().catch(() => {});
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(660, now);
+    osc.frequency.exponentialRampToValueAtTime(1100, now + 0.12);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.18);
+  } catch {
+    // ignore
+  }
+}
+
 type OrderType = "food" | "parcel";
 type Msg = { id: string; sender_id: string; body: string; created_at: string; read_at: string | null };
 
@@ -102,6 +126,7 @@ export function OrderChat({
     setSending(false);
     if (error) return toast.error(error.message);
     setText("");
+    playSendChime();
     setMsgs((prev) => {
       const row = data as unknown as Msg;
       if (!prev) return [row];

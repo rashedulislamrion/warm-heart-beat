@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { StarDisplay } from "@/components/Stars";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 export const Route = createFileRoute("/_authenticated/rider-hub")({
   head: () => ({ meta: [{ title: "রাইডার ড্যাশবোর্ড — পায়রা" }] }),
@@ -52,6 +53,12 @@ function RiderHub() {
   const [busy, setBusy] = useState<string | null>(null);
   const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
   const [rating, setRating] = useState<{ avg: number; count: number } | null>(null);
+  const { countFor, clearFor, unmute } = useUnreadMessages(user.id);
+
+  function openChat(target: { type: "food" | "parcel"; id: string; code: string }) {
+    clearFor(target.type, target.id);
+    setChat(target);
+  }
 
   useEffect(() => {
     (async () => {
@@ -259,14 +266,16 @@ function RiderHub() {
                 <>
                   {myActiveParcels.map((p) => (
                     <ActiveParcel key={p.id} p={p} busy={busy === p.id}
+                      unread={countFor("parcel", p.id)}
                       onNext={(next) => updateParcelStatus(p, next)}
-                      onChat={() => setChat({ type: "parcel", id: p.id, code: p.order_code })}
+                      onChat={() => openChat({ type: "parcel", id: p.id, code: p.order_code })}
                     />
                   ))}
                   {myActiveFoods.map((f) => (
                     <ActiveFood key={f.id} f={f} busy={busy === f.id}
+                      unread={countFor("food", f.id)}
                       onNext={(next) => updateFoodStatus(f, next)}
-                      onChat={() => setChat({ type: "food", id: f.id, code: f.order_code })}
+                      onChat={() => openChat({ type: "food", id: f.id, code: f.order_code })}
                     />
                   ))}
                 </>
@@ -293,7 +302,7 @@ function RiderHub() {
         </div>
       </main>
 
-      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) setChat(null); }}>
+      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) { if (chat) unmute(chat.type, chat.id); setChat(null); } }}>
         <DialogContent className="max-w-md p-0 sm:p-0">
           <DialogHeader className="px-5 pt-5">
             <DialogTitle className="font-bangla">অর্ডার {chat?.code}</DialogTitle>
@@ -373,7 +382,7 @@ function FoodCard({ f, onClaim, busy }: { f: FoodOrder; onClaim: () => void; bus
   );
 }
 
-function ActiveParcel({ p, busy, onNext, onChat }: { p: Parcel; busy: boolean; onNext: (next: string) => void; onChat: () => void }) {
+function ActiveParcel({ p, busy, unread, onNext, onChat }: { p: Parcel; busy: boolean; unread: number; onNext: (next: string) => void; onChat: () => void }) {
   const next = p.status === "rider_assigned" ? { key: "picked_up", label: "পিকআপ করেছি" }
     : p.status === "picked_up" ? { key: "delivered", label: "ডেলিভার সম্পন্ন" }
     : null;
@@ -401,15 +410,18 @@ function ActiveParcel({ p, busy, onNext, onChat }: { p: Parcel; busy: boolean; o
             <Check className="mr-1 h-4 w-4" /> <span className="font-bangla">{next.label}</span>
           </Button>
         )}
-        <Button onClick={onChat} size="sm" variant="outline" className="rounded-full">
+        <Button onClick={onChat} size="sm" variant="outline" className="relative rounded-full">
           <MessageCircle className="mr-1 h-4 w-4" /> <span className="font-bangla">চ্যাট</span>
+          {unread > 0 && (
+            <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{unread}</span>
+          )}
         </Button>
       </div>
     </div>
   );
 }
 
-function ActiveFood({ f, busy, onNext, onChat }: { f: FoodOrder; busy: boolean; onNext: (next: string) => void; onChat: () => void }) {
+function ActiveFood({ f, busy, unread, onNext, onChat }: { f: FoodOrder; busy: boolean; unread: number; onNext: (next: string) => void; onChat: () => void }) {
   const next = (f.status === "confirmed" || f.status === "preparing") ? { key: "picked_up", label: "পিকআপ করেছি" }
     : f.status === "picked_up" ? { key: "delivered", label: "ডেলিভার সম্পন্ন" }
     : null;
@@ -445,8 +457,11 @@ function ActiveFood({ f, busy, onNext, onChat }: { f: FoodOrder; busy: boolean; 
             <Check className="mr-1 h-4 w-4" /> <span className="font-bangla">{next.label}</span>
           </Button>
         )}
-        <Button onClick={onChat} size="sm" variant="outline" className="rounded-full">
+        <Button onClick={onChat} size="sm" variant="outline" className="relative rounded-full">
           <MessageCircle className="mr-1 h-4 w-4" /> <span className="font-bangla">চ্যাট</span>
+          {unread > 0 && (
+            <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{unread}</span>
+          )}
         </Button>
       </div>
     </div>

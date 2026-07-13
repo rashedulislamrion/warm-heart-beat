@@ -8,6 +8,7 @@ import { OrderChat } from "@/components/OrderChat";
 import { toast } from "sonner";
 import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search, MessageCircle, Bike, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDashboard,
@@ -52,6 +53,12 @@ function AdminDashboard() {
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
+  const { countFor, clearFor, unmute } = useUnreadMessages(user.id);
+
+  function openChat(target: { type: "food" | "parcel"; id: string; code: string }) {
+    clearFor(target.type, target.id);
+    setChat(target);
+  }
 
   async function assignRider(orderType: "food" | "parcel", id: string, riderId: string | null) {
     const table = orderType === "parcel" ? "parcels" : "food_orders";
@@ -260,11 +267,14 @@ function AdminDashboard() {
                   <div className="flex flex-wrap items-center gap-2">
                     <div className="text-sm font-bold text-primary">৳{r.delivery_charge}</div>
                     <button
-                      onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code })}
-                      className="grid h-9 w-9 place-items-center rounded-lg border border-border hover:bg-muted"
+                      onClick={() => openChat({ type: "parcel", id: r.id, code: r.order_code })}
+                      className="relative grid h-9 w-9 place-items-center rounded-lg border border-border hover:bg-muted"
                       aria-label="চ্যাট"
                     >
                       <MessageCircle className="h-4 w-4" />
+                      {countFor("parcel", r.id) > 0 && (
+                        <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{countFor("parcel", r.id)}</span>
+                      )}
                     </button>
                     <RiderAssign
                       riders={riders}
@@ -315,11 +325,14 @@ function AdminDashboard() {
                   <div className="flex flex-wrap items-center gap-2">
                     <div className="text-sm font-bold text-primary">৳{r.total}</div>
                     <button
-                      onClick={() => setChat({ type: "food", id: r.id, code: r.order_code })}
-                      className="grid h-9 w-9 place-items-center rounded-lg border border-border hover:bg-muted"
+                      onClick={() => openChat({ type: "food", id: r.id, code: r.order_code })}
+                      className="relative grid h-9 w-9 place-items-center rounded-lg border border-border hover:bg-muted"
                       aria-label="চ্যাট"
                     >
                       <MessageCircle className="h-4 w-4" />
+                      {countFor("food", r.id) > 0 && (
+                        <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{countFor("food", r.id)}</span>
+                      )}
                     </button>
                     <RiderAssign
                       riders={riders}
@@ -344,7 +357,7 @@ function AdminDashboard() {
         )}
       </div>
 
-      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) setChat(null); }}>
+      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) { if (chat) unmute(chat.type, chat.id); setChat(null); } }}>
         <DialogContent className="max-w-md p-0 sm:p-0">
           <DialogHeader className="px-5 pt-5">
             <DialogTitle className="font-bangla">অর্ডার {chat?.code}</DialogTitle>
