@@ -258,7 +258,7 @@ function OrdersPage() {
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       {canRate ? (
                         <button
-                          onClick={() => setReviewFor(r)}
+                          onClick={() => setReviewFor({ type: "food", order: r })}
                           className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
                         >
                           <Star className="h-3.5 w-3.5" />
