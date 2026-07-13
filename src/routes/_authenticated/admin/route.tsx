@@ -52,6 +52,7 @@ function AdminLayout() {
 
   const tabs = [
     { to: "/admin", label: "ড্যাশবোর্ড", Icon: LayoutDashboard },
+    { to: "/admin/analytics", label: "Analytics", Icon: BarChart3 },
     { to: "/admin/restaurants", label: "রেস্টুরেন্ট", Icon: Store },
     { to: "/admin/riders", label: "রাইডার", Icon: Bike },
   ] as const;
