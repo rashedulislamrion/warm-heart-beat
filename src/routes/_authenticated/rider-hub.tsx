@@ -23,12 +23,12 @@ type Parcel = {
   sender_name: string; sender_hall: string; sender_phone: string;
   receiver_name: string; receiver_hall: string; receiver_phone: string;
   item_type: string | null; size: string | null;
-  created_at: string; rider_id: string | null;
+  created_at: string; rider_id: string | null; scheduled_for: string | null;
 };
 type FoodOrder = {
   id: string; order_code: string; status: string; total: number; delivery_charge: number;
   receiver_name: string; receiver_hall: string; receiver_phone: string;
-  restaurant_id: string; items: any; created_at: string; rider_id: string | null;
+  restaurant_id: string; items: any; created_at: string; rider_id: string | null; scheduled_for: string | null;
 };
 
 type Tab = "available" | "active" | "done";
