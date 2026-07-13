@@ -6,8 +6,9 @@ import { FloatingActions } from "@/components/FloatingActions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowLeft, Star, Clock, Plus, Minus, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Star, Clock, Plus, Minus, ShoppingBag, MessageSquare } from "lucide-react";
 import { cart, useCart, cartCount, cartTotal, type CartItem } from "@/lib/cart";
+import { StarDisplay } from "@/components/Stars";
 
 export const Route = createFileRoute("/food/$restaurantId")({
   head: ({ loaderData }) => {
