@@ -446,6 +446,11 @@ function ActiveParcel({ p, busy, unread, onNext, onRelease, onChat }: { p: Parce
             <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{unread}</span>
           )}
         </Button>
+        {p.status === "rider_assigned" && (
+          <Button onClick={onRelease} disabled={busy} size="sm" variant="ghost" className="rounded-full text-destructive">
+            <span className="font-bangla">ছেড়ে দিন</span>
+          </Button>
+        )}
       </div>
     </div>
   );
