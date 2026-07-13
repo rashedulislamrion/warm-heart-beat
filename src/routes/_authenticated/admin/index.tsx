@@ -17,13 +17,13 @@ type Parcel = {
   id: string; order_code: string; status: string; delivery_charge: number;
   sender_name: string; sender_hall: string; sender_phone: string;
   receiver_name: string; receiver_hall: string; receiver_phone: string;
-  item_type: string; size: string; created_at: string;
+  item_type: string; size: string; created_at: string; rider_id: string | null;
 };
 
 type FoodOrder = {
   id: string; order_code: string; status: string; total: number; subtotal: number; delivery_charge: number;
   receiver_name: string; receiver_hall: string; receiver_phone: string;
-  restaurant_id: string; items: any; created_at: string;
+  restaurant_id: string; items: any; created_at: string; rider_id: string | null;
 };
 
 const parcelStatuses = ["pending", "rider_assigned", "picked_up", "delivered", "cancelled"] as const;
