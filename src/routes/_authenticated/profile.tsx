@@ -34,6 +34,8 @@ function ProfilePage() {
       .then(({ data }) => setIsRider(Boolean(data)));
     supabase.rpc("has_role", { _user_id: user.id, _role: "restaurant" })
       .then(({ data }) => setIsOwner(Boolean(data)));
+    supabase.rpc("my_unread_notification_count")
+      .then(({ data }) => setUnread(Number(data ?? 0)));
   }, [user.id]);
 
   async function signOut() {
