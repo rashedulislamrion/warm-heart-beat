@@ -152,14 +152,14 @@ function RiderHub() {
   }
   async function updateParcelStatus(p: Parcel, next: string) {
     setBusy(p.id);
-    const { error } = await supabase.from("parcels").update({ status: next }).eq("id", p.id);
+    const { error } = await supabase.from("parcels").update({ status: next as any }).eq("id", p.id);
     setBusy(null);
     if (error) return toast.error(error.message);
     toast.success("স্ট্যাটাস আপডেট");
   }
   async function updateFoodStatus(f: FoodOrder, next: string) {
     setBusy(f.id);
-    const { error } = await supabase.from("food_orders").update({ status: next }).eq("id", f.id);
+    const { error } = await supabase.from("food_orders").update({ status: next as any }).eq("id", f.id);
     setBusy(null);
     if (error) return toast.error(error.message);
     toast.success("স্ট্যাটাস আপডেট");

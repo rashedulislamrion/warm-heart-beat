@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FoodRestaurantIdRouteImport } from './routes/food.$restaurantId'
+import { Route as AuthenticatedRiderHubRouteImport } from './routes/_authenticated/rider-hub'
 import { Route as AuthenticatedProfileSetupRouteImport } from './routes/_authenticated/profile-setup'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedParcelRouteImport } from './routes/_authenticated/parcel'
@@ -62,6 +63,11 @@ const FoodRestaurantIdRoute = FoodRestaurantIdRouteImport.update({
   id: '/$restaurantId',
   path: '/$restaurantId',
   getParentRoute: () => FoodRoute,
+} as any)
+const AuthenticatedRiderHubRoute = AuthenticatedRiderHubRouteImport.update({
+  id: '/rider-hub',
+  path: '/rider-hub',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProfileSetupRoute =
   AuthenticatedProfileSetupRouteImport.update({
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/parcel': typeof AuthenticatedParcelRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/profile-setup': typeof AuthenticatedProfileSetupRoute
+  '/rider-hub': typeof AuthenticatedRiderHubRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/parcel': typeof AuthenticatedParcelRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/profile-setup': typeof AuthenticatedProfileSetupRoute
+  '/rider-hub': typeof AuthenticatedRiderHubRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/_authenticated/parcel': typeof AuthenticatedParcelRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/profile-setup': typeof AuthenticatedProfileSetupRoute
+  '/_authenticated/rider-hub': typeof AuthenticatedRiderHubRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/parcel'
     | '/profile'
     | '/profile-setup'
+    | '/rider-hub'
     | '/food/$restaurantId'
     | '/admin/analytics'
     | '/admin/restaurants'
@@ -223,6 +233,7 @@ export interface FileRouteTypes {
     | '/parcel'
     | '/profile'
     | '/profile-setup'
+    | '/rider-hub'
     | '/food/$restaurantId'
     | '/admin/analytics'
     | '/admin/restaurants'
@@ -244,6 +255,7 @@ export interface FileRouteTypes {
     | '/_authenticated/parcel'
     | '/_authenticated/profile'
     | '/_authenticated/profile-setup'
+    | '/_authenticated/rider-hub'
     | '/food/$restaurantId'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/restaurants'
@@ -312,6 +324,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/food/$restaurantId'
       preLoaderRoute: typeof FoodRestaurantIdRouteImport
       parentRoute: typeof FoodRoute
+    }
+    '/_authenticated/rider-hub': {
+      id: '/_authenticated/rider-hub'
+      path: '/rider-hub'
+      fullPath: '/rider-hub'
+      preLoaderRoute: typeof AuthenticatedRiderHubRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/profile-setup': {
       id: '/_authenticated/profile-setup'
@@ -428,6 +447,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedParcelRoute: typeof AuthenticatedParcelRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProfileSetupRoute: typeof AuthenticatedProfileSetupRoute
+  AuthenticatedRiderHubRoute: typeof AuthenticatedRiderHubRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -438,6 +458,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedParcelRoute: AuthenticatedParcelRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProfileSetupRoute: AuthenticatedProfileSetupRoute,
+  AuthenticatedRiderHubRoute: AuthenticatedRiderHubRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
