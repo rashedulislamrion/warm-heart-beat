@@ -5,8 +5,10 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Star, Clock, UtensilsCrossed, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Star, Clock, UtensilsCrossed, ShoppingBag, Heart } from "lucide-react";
 import { useCart, cartCount, cartTotal } from "@/lib/cart";
+import { useFavorites, useCurrentUserId } from "@/lib/favorites";
+import { FavoriteHeart } from "@/components/FavoriteHeart";
 
 export const Route = createFileRoute("/food")({
   head: () => ({
@@ -40,6 +42,9 @@ function FoodLayout() {
 function FoodIndex() {
   const [rows, setRows] = useState<Restaurant[] | null>(null);
   const [ratings, setRatings] = useState<Record<string, { avg: number; count: number }>>({});
+  const [showFavsOnly, setShowFavsOnly] = useState(false);
+  const uid = useCurrentUserId();
+  const { ids: favIds, toggle: toggleFav } = useFavorites(uid);
   const items = useCart();
   const count = cartCount(items);
   const total = cartTotal(items);
@@ -79,10 +84,30 @@ function FoodIndex() {
           সরাসরি হলে ডেলিভারি — দ্রুত, গরম, বন্ধুত্বপূর্ণ দামে
         </p>
 
+        {uid && favIds.size > 0 && (
+          <div className="mt-4 flex items-center gap-2">
+            <button
+              onClick={() => setShowFavsOnly(false)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${!showFavsOnly ? "gradient-primary text-primary-foreground shadow-soft" : "bg-secondary text-muted-foreground"}`}
+            >
+              <span className="font-bangla">সব</span>
+            </button>
+            <button
+              onClick={() => setShowFavsOnly(true)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${showFavsOnly ? "gradient-primary text-primary-foreground shadow-soft" : "bg-secondary text-muted-foreground"}`}
+            >
+              <Heart className="h-3 w-3" />
+              <span className="font-bangla">প্রিয় ({favIds.size})</span>
+            </button>
+          </div>
+        )}
+
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {rows === null
             ? [...Array(4)].map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-3xl" />)
-            : rows.map((r) => (
+            : rows
+                .filter((r) => (showFavsOnly ? favIds.has(r.id) : true))
+                .map((r) => (
                 <Link
                   key={r.id}
                   to="/food/$restaurantId"
@@ -102,6 +127,14 @@ function FoodIndex() {
                       <div className="absolute inset-0 grid place-items-center bg-black/50 text-sm font-bold text-white">
                         বন্ধ
                       </div>
+                    )}
+                    {uid && (
+                      <FavoriteHeart
+                        active={favIds.has(r.id)}
+                        onClick={() => toggleFav(r.id)}
+                        className="absolute left-2 top-2"
+                        size={16}
+                      />
                     )}
                     <div className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[11px] font-bold text-foreground shadow-soft">
                       <Star className="h-3 w-3 fill-accent text-accent" />

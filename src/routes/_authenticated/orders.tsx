@@ -1,13 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Package, ArrowLeft, Inbox, UtensilsCrossed, Star } from "lucide-react";
+import { Package, ArrowLeft, Inbox, UtensilsCrossed, Star, Search, RotateCw } from "lucide-react";
 import { StarDisplay } from "@/components/Stars";
 import { ReviewDialog } from "@/components/ReviewDialog";
+import { cart } from "@/lib/cart";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/orders")({
   head: () => ({ meta: [{ title: "আমার অর্ডার — পায়রা" }] }),
@@ -18,9 +20,11 @@ type Parcel = {
   id: string; order_code: string; status: string; delivery_charge: number;
   sender_hall: string; receiver_hall: string; created_at: string;
 };
+type OrderItem = { id: string; name: string; price: number; qty: number };
 type FoodOrder = {
   id: string; order_code: string; status: string; total: number;
   receiver_hall: string; restaurant_id: string | null; created_at: string;
+  items: OrderItem[];
 };
 
 type ReviewRow = { order_id: string; rating: number };
@@ -45,11 +49,14 @@ type Tab = "parcel" | "food";
 
 function OrdersPage() {
   const { user } = Route.useRouteContext();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("parcel");
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [reviewFor, setReviewFor] = useState<FoodOrder | null>(null);
+  const [q, setQ] = useState("");
+  const [reordering, setReordering] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("parcels")
@@ -58,10 +65,10 @@ function OrdersPage() {
       .order("created_at", { ascending: false })
       .then(({ data }) => setParcels((data as Parcel[]) ?? []));
     supabase.from("food_orders")
-      .select("id, order_code, status, total, receiver_hall, restaurant_id, created_at")
+      .select("id, order_code, status, total, receiver_hall, restaurant_id, created_at, items")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .then(({ data }) => setFoods((data as FoodOrder[]) ?? []));
+      .then(({ data }) => setFoods(((data ?? []) as unknown) as FoodOrder[]));
     supabase.from("reviews" as any)
       .select("order_id, rating")
       .eq("user_id", user.id)
@@ -71,6 +78,40 @@ function OrdersPage() {
         setRatings(map);
       });
   }, [user.id]);
+
+  async function reorder(order: FoodOrder) {
+    if (!order.restaurant_id) return;
+    setReordering(order.id);
+    try {
+      const ids = order.items.map((i) => i.id);
+      const [{ data: rest }, { data: menu }] = await Promise.all([
+        supabase.from("restaurants").select("id, name").eq("id", order.restaurant_id).maybeSingle(),
+        supabase.from("menu_items")
+          .select("id, name, price, image_url, is_available")
+          .in("id", ids),
+      ]);
+      if (!rest) { toast.error("রেস্টুরেন্ট পাওয়া যায়নি"); return; }
+      const available = (menu ?? []).filter((m) => m.is_available);
+      if (available.length === 0) { toast.error("আইটেম আর নেই"); return; }
+      cart.clear();
+      for (const it of order.items) {
+        const m = available.find((x) => x.id === it.id);
+        if (!m) continue;
+        for (let i = 0; i < it.qty; i++) {
+          cart.add(
+            { id: m.id, name: m.name, price: m.price, image_url: m.image_url, restaurant_id: rest.id, restaurant_name: rest.name },
+            rest.name,
+          );
+        }
+      }
+      const skipped = order.items.length - available.length;
+      if (skipped > 0) toast(`${skipped}টি আইটেম আর নেই`);
+      else toast.success("কার্টে যোগ হয়েছে");
+      navigate({ to: "/checkout" });
+    } finally {
+      setReordering(null);
+    }
+  }
 
   return (
     <div className="min-h-screen gradient-hero pb-24">
@@ -97,14 +138,32 @@ function OrdersPage() {
           ))}
         </div>
 
+        <div className="relative mt-4">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="অর্ডার কোড বা হল খুঁজুন..."
+            className="w-full rounded-full border border-border bg-card py-2 pl-9 pr-3 text-sm outline-none focus:border-primary"
+          />
+        </div>
+
         <div className="mt-4 space-y-3">
           {tab === "parcel" ? (
             parcels === null ? (
               [...Array(3)].map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)
             ) : parcels.length === 0 ? (
               <EmptyState label="কোনো পার্সেল অর্ডার নেই" to="/parcel" cta="প্রথম পার্সেল পাঠান" />
-            ) : (
-              parcels.map((r) => {
+            ) : (() => {
+              const ql = q.trim().toLowerCase();
+              const filtered = ql
+                ? parcels.filter((r) =>
+                    r.order_code.toLowerCase().includes(ql) ||
+                    r.sender_hall.toLowerCase().includes(ql) ||
+                    r.receiver_hall.toLowerCase().includes(ql))
+                : parcels;
+              if (filtered.length === 0) return <p className="py-10 text-center font-bangla text-sm text-muted-foreground">কিছু পাওয়া যায়নি</p>;
+              return filtered.map((r) => {
                 const s = parcelStatus[r.status] ?? parcelStatus.pending!;
                 return (
                   <Card
@@ -118,17 +177,25 @@ function OrdersPage() {
                     amount={r.delivery_charge}
                   />
                 );
-              })
-            )
+              });
+            })()
           ) : foods === null ? (
             [...Array(3)].map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)
           ) : foods.length === 0 ? (
             <EmptyState label="কোনো খাবার অর্ডার নেই" to="/food" cta="খাবার অর্ডার করুন" />
-          ) : (
-            foods.map((r) => {
+          ) : (() => {
+            const ql = q.trim().toLowerCase();
+            const filtered = ql
+              ? foods.filter((r) =>
+                  r.order_code.toLowerCase().includes(ql) ||
+                  r.receiver_hall.toLowerCase().includes(ql))
+              : foods;
+            if (filtered.length === 0) return <p className="py-10 text-center font-bangla text-sm text-muted-foreground">কিছু পাওয়া যায়নি</p>;
+            return filtered.map((r) => {
               const s = foodStatus[r.status] ?? foodStatus.pending!;
               const rated = ratings[r.id];
               const canRate = r.status === "delivered" && !rated;
+              const canReorder = r.restaurant_id && Array.isArray(r.items) && r.items.length > 0;
               return (
                 <Card
                   key={r.id}
@@ -141,25 +208,37 @@ function OrdersPage() {
                   amount={r.total}
                   accent
                   footer={
-                    canRate ? (
-                      <button
-                        onClick={() => setReviewFor(r)}
-                        className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
-                      >
-                        <Star className="h-3.5 w-3.5" />
-                        <span className="font-bangla">রিভিউ দিন</span>
-                      </button>
-                    ) : rated ? (
-                      <div className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground">
-                        <StarDisplay value={rated} size={13} />
-                        <span className="font-bangla">আপনার রেটিং</span>
-                      </div>
-                    ) : null
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      {canRate ? (
+                        <button
+                          onClick={() => setReviewFor(r)}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
+                        >
+                          <Star className="h-3.5 w-3.5" />
+                          <span className="font-bangla">রিভিউ দিন</span>
+                        </button>
+                      ) : rated ? (
+                        <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                          <StarDisplay value={rated} size={13} />
+                          <span className="font-bangla">আপনার রেটিং</span>
+                        </div>
+                      ) : null}
+                      {canReorder && (
+                        <button
+                          onClick={() => reorder(r)}
+                          disabled={reordering === r.id}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10 disabled:opacity-60"
+                        >
+                          <RotateCw className={`h-3.5 w-3.5 ${reordering === r.id ? "animate-spin" : ""}`} />
+                          <span className="font-bangla">আবার অর্ডার</span>
+                        </button>
+                      )}
+                    </div>
                   }
                 />
               );
-            })
-          )}
+            });
+          })()}
         </div>
       </div>
 

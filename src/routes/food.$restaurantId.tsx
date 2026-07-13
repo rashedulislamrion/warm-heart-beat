@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { ArrowLeft, Star, Clock, Plus, Minus, ShoppingBag, MessageSquare } from "lucide-react";
 import { cart, useCart, cartCount, cartTotal, type CartItem } from "@/lib/cart";
 import { StarDisplay } from "@/components/Stars";
+import { useFavorites, useCurrentUserId } from "@/lib/favorites";
+import { FavoriteHeart } from "@/components/FavoriteHeart";
 
 export const Route = createFileRoute("/food/$restaurantId")({
   head: ({ loaderData }) => {
@@ -64,6 +66,8 @@ function RestaurantPage() {
   const items = useCart();
   const count = cartCount(items);
   const total = cartTotal(items);
+  const uid = useCurrentUserId();
+  const { ids: favIds, toggle: toggleFav } = useFavorites(uid);
 
   useEffect(() => {
     supabase
@@ -132,6 +136,14 @@ function RestaurantPage() {
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
+        {uid && (
+          <FavoriteHeart
+            active={favIds.has(r.id)}
+            onClick={() => toggleFav(r.id)}
+            className="absolute right-4 top-4"
+            size={20}
+          />
+        )}
       </div>
 
       <div className="mx-auto -mt-8 max-w-3xl px-4">
