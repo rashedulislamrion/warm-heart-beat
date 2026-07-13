@@ -90,6 +90,12 @@ function CheckoutPage() {
     if (!items.length || !restaurant_id) return;
     const r = schema.safeParse(form);
     if (!r.success) return toast.error(r.error.issues[0]!.message);
+    if (schedule.mode === "later") {
+      if (!schedule.iso) return toast.error("সময় বেছে নিন");
+      if (new Date(schedule.iso).getTime() < Date.now() + 25 * 60 * 1000) {
+        return toast.error("কমপক্ষে ৩০ মিনিট পরের সময় দিন");
+      }
+    }
 
     setSubmitting(true);
     const { data, error } = await supabase
@@ -107,6 +113,7 @@ function CheckoutPage() {
         receiver_block_room: form.receiver_block_room,
         receiver_landmark: form.receiver_landmark || null,
         note: form.note || null,
+        scheduled_for: schedule.mode === "later" ? schedule.iso : null,
       })
       .select("id, order_code")
       .single();
