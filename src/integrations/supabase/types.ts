@@ -638,6 +638,57 @@ export type Database = {
           },
         ]
       }
+      rider_applications: {
+        Row: {
+          admin_note: string | null
+          availability: string | null
+          created_at: string
+          department: string | null
+          full_name: string
+          hall: string | null
+          has_bike: boolean
+          id: string
+          motivation: string | null
+          phone: string
+          semester: string | null
+          status: string
+          student_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          availability?: string | null
+          created_at?: string
+          department?: string | null
+          full_name: string
+          hall?: string | null
+          has_bike?: boolean
+          id?: string
+          motivation?: string | null
+          phone: string
+          semester?: string | null
+          status?: string
+          student_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          availability?: string | null
+          created_at?: string
+          department?: string | null
+          full_name?: string
+          hall?: string | null
+          has_bike?: boolean
+          id?: string
+          motivation?: string | null
+          phone?: string
+          semester?: string | null
+          status?: string
+          student_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_credits: {
         Row: {
           amount: number
