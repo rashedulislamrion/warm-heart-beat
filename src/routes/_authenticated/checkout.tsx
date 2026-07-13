@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MALE_HALLS, FEMALE_HALLS, OTHER_LOCATIONS, calculateDeliveryCharge } from "@/lib/halls";
 import { cart, useCart, cartTotal, cartCount } from "@/lib/cart";
 import { fireConfetti } from "@/lib/confetti";
+import { PromoAndCredits } from "@/components/PromoAndCredits";
 import { ArrowLeft, Loader2, Minus, Plus, PartyPopper, ShoppingBag, Trash2, Copy } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
@@ -46,6 +47,15 @@ function CheckoutPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [orderCode, setOrderCode] = useState<string | null>(null);
+  const [discounts, setDiscounts] = useState<{ promoCode: string | null; promoDiscount: number; creditsUsed: number }>({
+    promoCode: null,
+    promoDiscount: 0,
+    creditsUsed: 0,
+  });
+  const onDiscountsChange = useCallback(
+    (v: { promoCode: string | null; promoDiscount: number; creditsUsed: number }) => setDiscounts(v),
+    [],
+  );
 
   useEffect(() => {
     (async () => {
@@ -67,7 +77,9 @@ function CheckoutPage() {
     () => (form.receiver_hall ? calculateDeliveryCharge(RESTAURANT_ORIGIN, form.receiver_hall, "small") : 30),
     [form.receiver_hall],
   );
-  const total = subtotal + deliveryCharge;
+  const totalBeforeDiscount = subtotal + deliveryCharge;
+  const totalDiscount = discounts.promoDiscount + discounts.creditsUsed;
+  const total = Math.max(0, totalBeforeDiscount - totalDiscount);
 
   const restaurant_id = items[0]?.restaurant_id ?? null;
   const restaurant_name = items[0]?.restaurant_name ?? "";
@@ -94,10 +106,33 @@ function CheckoutPage() {
         receiver_landmark: form.receiver_landmark || null,
         note: form.note || null,
       })
-      .select("order_code")
+      .select("id, order_code")
       .single();
+    if (error || !data) {
+      setSubmitting(false);
+      return toast.error(error?.message ?? "অর্ডার ব্যর্থ");
+    }
+
+    // Apply promo + credits after successful insert (best-effort; discount already baked in total)
+    if (discounts.promoCode) {
+      const { error: pe } = await (supabase.rpc as any)("redeem_promo", {
+        _code: discounts.promoCode,
+        _order_type: "food",
+        _order_id: data.id,
+        _subtotal: subtotal,
+      });
+      if (pe) console.warn("promo redeem failed", pe.message);
+    }
+    if (discounts.creditsUsed > 0) {
+      const { error: ce } = await (supabase.rpc as any)("redeem_credits", {
+        _amount: discounts.creditsUsed,
+        _order_type: "food",
+        _order_id: data.id,
+      });
+      if (ce) console.warn("credits redeem failed", ce.message);
+    }
+
     setSubmitting(false);
-    if (error || !data) return toast.error(error?.message ?? "অর্ডার ব্যর্থ");
     cart.clear();
     setOrderCode(data.order_code);
     fireConfetti();
@@ -280,6 +315,8 @@ function CheckoutPage() {
           </div>
         </div>
 
+        <PromoAndCredits subtotal={subtotal} orderType="food" onChange={onDiscountsChange} />
+
         <div className="rounded-3xl border border-border bg-card p-5 shadow-card">
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
@@ -290,6 +327,18 @@ function CheckoutPage() {
               <span className="font-bangla text-muted-foreground">ডেলিভারি চার্জ</span>
               <span className="font-bold">৳{deliveryCharge}</span>
             </div>
+            {discounts.promoDiscount > 0 && (
+              <div className="flex justify-between">
+                <span className="font-bangla text-muted-foreground">প্রোমো ({discounts.promoCode})</span>
+                <span className="font-bold text-success">−৳{discounts.promoDiscount}</span>
+              </div>
+            )}
+            {discounts.creditsUsed > 0 && (
+              <div className="flex justify-between">
+                <span className="font-bangla text-muted-foreground">ক্রেডিট</span>
+                <span className="font-bold text-success">−৳{discounts.creditsUsed}</span>
+              </div>
+            )}
             <div className="mt-3 flex justify-between border-t pt-3 text-lg">
               <span className="font-bangla font-bold">মোট</span>
               <span className="font-extrabold text-primary">৳{total}</span>
@@ -297,6 +346,7 @@ function CheckoutPage() {
             <div className="mt-1 font-bangla text-xs text-muted-foreground">Cash on Delivery</div>
           </div>
         </div>
+
 
         <Button
           onClick={submit}
