@@ -7,7 +7,7 @@ export const MALE_HALLS = [
   "Shah Amanat Hall",
   "Shaheed Abdur Rab Hall",
   "Masterda Surya Sen Hall",
-  "Bangabandhu Hall",
+  "Forhad Hossain Hall",
   "Atish Dipankar Hall",
 ] as const;
 
@@ -47,7 +47,7 @@ const ZONE_A = new Set<string>([
 const ZONE_B = new Set<string>([
   "Shaheed Abdur Rab Hall",
   "Masterda Surya Sen Hall",
-  "Bangabandhu Hall",
+  "Forhad Hossain Hall",
   "Atish Dipankar Hall",
 ]);
 const ZONE_C = new Set<string>([
