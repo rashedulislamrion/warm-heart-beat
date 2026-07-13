@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FoodRestaurantIdRouteImport } from './routes/food.$restaurantId'
+import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedRiderHubRouteImport } from './routes/_authenticated/rider-hub'
 import { Route as AuthenticatedProfileSetupRouteImport } from './routes/_authenticated/profile-setup'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -25,6 +26,7 @@ import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminWalletRouteImport } from './routes/_authenticated/admin/wallet'
 import { Route as AuthenticatedAdminRidersRouteImport } from './routes/_authenticated/admin/riders'
 import { Route as AuthenticatedAdminRestaurantsRouteImport } from './routes/_authenticated/admin/restaurants'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
@@ -63,6 +65,11 @@ const FoodRestaurantIdRoute = FoodRestaurantIdRouteImport.update({
   id: '/$restaurantId',
   path: '/$restaurantId',
   getParentRoute: () => FoodRoute,
+} as any)
+const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedRiderHubRoute = AuthenticatedRiderHubRouteImport.update({
   id: '/rider-hub',
@@ -110,6 +117,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminWalletRoute =
+  AuthenticatedAdminWalletRouteImport.update({
+    id: '/wallet',
+    path: '/wallet',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminRidersRoute =
   AuthenticatedAdminRidersRouteImport.update({
     id: '/riders',
@@ -148,10 +161,12 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/profile-setup': typeof AuthenticatedProfileSetupRoute
   '/rider-hub': typeof AuthenticatedRiderHubRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/admin/riders': typeof AuthenticatedAdminRidersRoute
+  '/admin/wallet': typeof AuthenticatedAdminWalletRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/order-push': typeof ApiPublicHooksOrderPushRoute
 }
@@ -168,10 +183,12 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/profile-setup': typeof AuthenticatedProfileSetupRoute
   '/rider-hub': typeof AuthenticatedRiderHubRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/admin/riders': typeof AuthenticatedAdminRidersRoute
+  '/admin/wallet': typeof AuthenticatedAdminWalletRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/order-push': typeof ApiPublicHooksOrderPushRoute
 }
@@ -191,10 +208,12 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/profile-setup': typeof AuthenticatedProfileSetupRoute
   '/_authenticated/rider-hub': typeof AuthenticatedRiderHubRoute
+  '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/_authenticated/admin/riders': typeof AuthenticatedAdminRidersRoute
+  '/_authenticated/admin/wallet': typeof AuthenticatedAdminWalletRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/order-push': typeof ApiPublicHooksOrderPushRoute
 }
@@ -214,10 +233,12 @@ export interface FileRouteTypes {
     | '/profile'
     | '/profile-setup'
     | '/rider-hub'
+    | '/wallet'
     | '/food/$restaurantId'
     | '/admin/analytics'
     | '/admin/restaurants'
     | '/admin/riders'
+    | '/admin/wallet'
     | '/admin/'
     | '/api/public/hooks/order-push'
   fileRoutesByTo: FileRoutesByTo
@@ -234,10 +255,12 @@ export interface FileRouteTypes {
     | '/profile'
     | '/profile-setup'
     | '/rider-hub'
+    | '/wallet'
     | '/food/$restaurantId'
     | '/admin/analytics'
     | '/admin/restaurants'
     | '/admin/riders'
+    | '/admin/wallet'
     | '/admin'
     | '/api/public/hooks/order-push'
   id:
@@ -256,10 +279,12 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/profile-setup'
     | '/_authenticated/rider-hub'
+    | '/_authenticated/wallet'
     | '/food/$restaurantId'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/restaurants'
     | '/_authenticated/admin/riders'
+    | '/_authenticated/admin/wallet'
     | '/_authenticated/admin/'
     | '/api/public/hooks/order-push'
   fileRoutesById: FileRoutesById
@@ -325,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FoodRestaurantIdRouteImport
       parentRoute: typeof FoodRoute
     }
+    '/_authenticated/wallet': {
+      id: '/_authenticated/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof AuthenticatedWalletRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rider-hub': {
       id: '/_authenticated/rider-hub'
       path: '/rider-hub'
@@ -388,6 +420,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/wallet': {
+      id: '/_authenticated/admin/wallet'
+      path: '/wallet'
+      fullPath: '/admin/wallet'
+      preLoaderRoute: typeof AuthenticatedAdminWalletRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/riders': {
       id: '/_authenticated/admin/riders'
       path: '/riders'
@@ -423,6 +462,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminRestaurantsRoute: typeof AuthenticatedAdminRestaurantsRoute
   AuthenticatedAdminRidersRoute: typeof AuthenticatedAdminRidersRoute
+  AuthenticatedAdminWalletRoute: typeof AuthenticatedAdminWalletRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -431,6 +471,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminRestaurantsRoute: AuthenticatedAdminRestaurantsRoute,
     AuthenticatedAdminRidersRoute: AuthenticatedAdminRidersRoute,
+    AuthenticatedAdminWalletRoute: AuthenticatedAdminWalletRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
@@ -448,6 +489,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProfileSetupRoute: typeof AuthenticatedProfileSetupRoute
   AuthenticatedRiderHubRoute: typeof AuthenticatedRiderHubRoute
+  AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -459,6 +501,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProfileSetupRoute: AuthenticatedProfileSetupRoute,
   AuthenticatedRiderHubRoute: AuthenticatedRiderHubRoute,
+  AuthenticatedWalletRoute: AuthenticatedWalletRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

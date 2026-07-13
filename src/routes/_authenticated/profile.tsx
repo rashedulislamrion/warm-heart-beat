@@ -7,7 +7,7 @@ import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, LogOut, Pencil, User as UserIcon, Phone, MapPin, Shield, Gift, Bike } from "lucide-react";
+import { ArrowLeft, LogOut, Pencil, User as UserIcon, Phone, MapPin, Shield, Gift, Bike, Wallet } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -83,6 +83,14 @@ function ProfilePage() {
             >
               <Gift className="h-4 w-4" />
               <span className="font-bangla">বন্ধু আনুন, ৳৫০ পান</span>
+            </Link>
+
+            <Link
+              to="/wallet"
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm font-semibold hover:bg-secondary"
+            >
+              <Wallet className="h-4 w-4" />
+              <span className="font-bangla">ওয়ালেট</span>
             </Link>
 
             {isRider && (

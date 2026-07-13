@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
-import { Loader2, LayoutDashboard, Store, ArrowLeft, Bike, BarChart3 } from "lucide-react";
+import { Loader2, LayoutDashboard, Store, ArrowLeft, Bike, BarChart3, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -55,6 +55,7 @@ function AdminLayout() {
     { to: "/admin/analytics", label: "Analytics", Icon: BarChart3 },
     { to: "/admin/restaurants", label: "রেস্টুরেন্ট", Icon: Store },
     { to: "/admin/riders", label: "রাইডার", Icon: Bike },
+    { to: "/admin/wallet", label: "ওয়ালেট", Icon: Wallet },
   ] as const;
 
   return (
