@@ -5,8 +5,10 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Star, Clock, UtensilsCrossed, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Star, Clock, UtensilsCrossed, ShoppingBag, Heart } from "lucide-react";
 import { useCart, cartCount, cartTotal } from "@/lib/cart";
+import { useFavorites, useCurrentUserId } from "@/lib/favorites";
+import { FavoriteHeart } from "@/components/FavoriteHeart";
 
 export const Route = createFileRoute("/food")({
   head: () => ({
