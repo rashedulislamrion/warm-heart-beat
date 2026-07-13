@@ -412,7 +412,7 @@ function FoodCard({ f, onClaim, busy }: { f: FoodOrder; onClaim: () => void; bus
   );
 }
 
-function ActiveParcel({ p, busy, unread, onNext, onChat }: { p: Parcel; busy: boolean; unread: number; onNext: (next: string) => void; onChat: () => void }) {
+function ActiveParcel({ p, busy, unread, onNext, onRelease, onChat }: { p: Parcel; busy: boolean; unread: number; onNext: (next: string) => void; onRelease: () => void; onChat: () => void }) {
   const next = p.status === "rider_assigned" ? { key: "picked_up", label: "পিকআপ করেছি" }
     : p.status === "picked_up" ? { key: "delivered", label: "ডেলিভার সম্পন্ন" }
     : null;
