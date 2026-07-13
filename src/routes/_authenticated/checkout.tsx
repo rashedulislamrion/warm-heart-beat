@@ -107,6 +107,28 @@ function CheckoutPage() {
     }
 
     setSubmitting(true);
+
+    // Re-validate availability & pricing right before placing order
+    const ids = items.map((i) => i.id);
+    const { data: fresh, error: freshErr } = await supabase
+      .from("menu_items")
+      .select("id, name, price, is_available")
+      .in("id", ids);
+    if (freshErr) {
+      setSubmitting(false);
+      return toast.error(freshErr.message);
+    }
+    const byId = new Map((fresh ?? []).map((m: any) => [m.id, m]));
+    for (const it of items) {
+      const cur = byId.get(it.id);
+      if (!cur) { setSubmitting(false); return toast.error(`"${it.name}" আর নেই`); }
+      if (!cur.is_available) { setSubmitting(false); return toast.error(`"${it.name}" এখন অনুপলব্ধ`); }
+      if (Number(cur.price) !== it.price) {
+        setSubmitting(false);
+        return toast.error(`"${it.name}" এর দাম পরিবর্তন হয়েছে, কার্ট রিফ্রেশ করুন`);
+      }
+    }
+
     const { data, error } = await supabase
       .from("food_orders")
       .insert({
