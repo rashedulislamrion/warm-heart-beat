@@ -284,8 +284,29 @@ function OrdersPage() {
         />
       )}
 
+      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) setChat(null); }}>
+        <DialogContent className="max-w-md p-0 sm:p-0">
+          <DialogHeader className="px-5 pt-5">
+            <DialogTitle className="font-bangla">অর্ডার {chat?.code}</DialogTitle>
+          </DialogHeader>
+          <div className="px-3 pb-3">
+            {chat && (
+              <OrderChat
+                orderType={chat.type}
+                orderId={chat.id}
+                currentUserId={user.id}
+                otherPartyName={chat.hasRider ? "রাইডার" : "সাপোর্ট"}
+                disabled={!chat.hasRider}
+                disabledReason="রাইডার নিয়োগ হলে চ্যাট শুরু হবে"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <FloatingActions />
       <MobileBottomNav />
+
     </div>
   );
 }
