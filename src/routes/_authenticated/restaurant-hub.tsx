@@ -316,6 +316,7 @@ function SettingsTab({ restaurant, onSaved }: { restaurant: Restaurant; onSaved:
     min_order: restaurant.min_order,
     open_time: restaurant.open_time ?? "",
     close_time: restaurant.close_time ?? "",
+    location: restaurant.location ?? "Gate-1",
   });
   const [saving, setSaving] = useState(false);
 
@@ -330,6 +331,7 @@ function SettingsTab({ restaurant, onSaved }: { restaurant: Restaurant; onSaved:
       min_order: Number(form.min_order) || 0,
       open_time: form.open_time || null,
       close_time: form.close_time || null,
+      location: form.location || "Gate-1",
     };
     const { data, error } = await supabase.from("restaurants").update(payload).eq("id", restaurant.id).select().single();
     setSaving(false);
@@ -346,6 +348,9 @@ function SettingsTab({ restaurant, onSaved }: { restaurant: Restaurant; onSaved:
         <Field label="Cuisine"><Input value={form.cuisine} onChange={(e) => setForm({ ...form, cuisine: e.target.value })} /></Field>
         <Field label="ইমেজ URL"><Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} /></Field>
       </div>
+      <Field label="পিকআপ লোকেশন (ডেলিভারি চার্জ হিসাবের জন্য)">
+        <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="Gate-1" />
+      </Field>
       <div className="grid grid-cols-2 gap-3">
         <Field label="ডেলিভারি (মিনিট)"><Input type="number" value={form.delivery_time_min} onChange={(e) => setForm({ ...form, delivery_time_min: +e.target.value })} /></Field>
         <Field label="সর্বনিম্ন অর্ডার"><Input type="number" value={form.min_order} onChange={(e) => setForm({ ...form, min_order: +e.target.value })} /></Field>
