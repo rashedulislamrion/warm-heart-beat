@@ -82,6 +82,7 @@ function ParcelFlow() {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>(1);
   const [data, setData] = useState<ParcelState>(empty);
+  const [schedule, setSchedule] = useState<Schedule>({ mode: "now", iso: null });
   const [submitting, setSubmitting] = useState(false);
   const [orderCode, setOrderCode] = useState<string | null>(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
