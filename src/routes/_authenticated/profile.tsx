@@ -20,6 +20,7 @@ function ProfilePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [profile, setProfile] = useState<any>(undefined);
+  const [unread, setUnread] = useState<number>(0);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isRider, setIsRider] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
