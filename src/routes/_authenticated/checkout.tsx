@@ -31,8 +31,7 @@ const schema = z.object({
   receiver_block_room: z.string().trim().min(1, "ব্লক/রুম দিন"),
 });
 
-// Assume restaurant is near "Gate-1" origin for charge calc
-const RESTAURANT_ORIGIN = "Gate-1";
+const DEFAULT_ORIGIN = "Gate-1";
 
 function CheckoutPage() {
   const { user } = Route.useRouteContext();
