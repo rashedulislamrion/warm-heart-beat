@@ -60,6 +60,7 @@ function OrdersPage() {
   const [reviewFor, setReviewFor] = useState<FoodOrder | null>(null);
   const [q, setQ] = useState("");
   const [reordering, setReordering] = useState<string | null>(null);
+  const [chat, setChat] = useState<ChatTarget | null>(null);
 
   useEffect(() => {
     supabase.from("parcels")
