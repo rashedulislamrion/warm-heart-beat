@@ -78,8 +78,21 @@ function AdminDashboard() {
       const { data: roles } = await supabase.from("user_roles").select("user_id").eq("role", "rider");
       const ids = (roles ?? []).map((r: any) => r.user_id);
       if (ids.length === 0) { setRiders([]); return; }
-      const { data: profs } = await supabase.from("profiles").select("id, full_name, phone").in("id", ids);
-      setRiders((profs as Rider[]) ?? []);
+      const [{ data: profs }, { data: apps }] = await Promise.all([
+        supabase.from("profiles").select("id, full_name, phone").in("id", ids),
+        supabase.from("rider_applications").select("user_id, full_name, phone").in("user_id", ids).eq("status", "approved"),
+      ]);
+      const appMap = new Map((apps ?? []).map((a: any) => [a.user_id, a]));
+      const merged: Rider[] = ids.map((id) => {
+        const p = (profs ?? []).find((x: any) => x.id === id);
+        const a: any = appMap.get(id);
+        return {
+          id,
+          full_name: p?.full_name || a?.full_name || null,
+          phone: p?.phone || a?.phone || null,
+        };
+      });
+      setRiders(merged);
     })();
 
     const ch1 = supabase
