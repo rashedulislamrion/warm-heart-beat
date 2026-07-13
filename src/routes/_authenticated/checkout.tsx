@@ -46,6 +46,7 @@ function CheckoutPage() {
     note: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [restaurantOrigin, setRestaurantOrigin] = useState<string>(DEFAULT_ORIGIN);
   const [orderCode, setOrderCode] = useState<string | null>(null);
   const [schedule, setSchedule] = useState<Schedule>({ mode: "now", iso: null });
   const [discounts, setDiscounts] = useState<{ promoCode: string | null; promoDiscount: number; creditsUsed: number }>({
