@@ -48,6 +48,7 @@ function CheckoutPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [orderCode, setOrderCode] = useState<string | null>(null);
+  const [schedule, setSchedule] = useState<Schedule>({ mode: "now", iso: null });
   const [discounts, setDiscounts] = useState<{ promoCode: string | null; promoDiscount: number; creditsUsed: number }>({
     promoCode: null,
     promoDiscount: 0,
