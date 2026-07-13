@@ -161,6 +161,36 @@ export type Database = {
           },
         ]
       }
+      order_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          order_id: string
+          order_type: string
+          read_at: string | null
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          order_id: string
+          order_type: string
+          read_at?: string | null
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          order_id?: string
+          order_type?: string
+          read_at?: string | null
+          sender_id?: string
+        }
+        Relationships: []
+      }
       parcels: {
         Row: {
           created_at: string
@@ -510,6 +540,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_order_party: {
+        Args: { _order_id: string; _order_type: string; _user: string }
         Returns: boolean
       }
       my_credit_balance: { Args: never; Returns: number }

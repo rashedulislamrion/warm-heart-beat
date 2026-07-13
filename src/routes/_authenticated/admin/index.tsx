@@ -3,8 +3,10 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { OrderChat } from "@/components/OrderChat";
 import { toast } from "sonner";
-import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search } from "lucide-react";
+import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search, MessageCircle, UserPlus, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
@@ -15,13 +17,13 @@ type Parcel = {
   id: string; order_code: string; status: string; delivery_charge: number;
   sender_name: string; sender_hall: string; sender_phone: string;
   receiver_name: string; receiver_hall: string; receiver_phone: string;
-  item_type: string; size: string; created_at: string;
+  item_type: string; size: string; created_at: string; rider_id: string | null;
 };
 
 type FoodOrder = {
   id: string; order_code: string; status: string; total: number; subtotal: number; delivery_charge: number;
   receiver_name: string; receiver_hall: string; receiver_phone: string;
-  restaurant_id: string; items: any; created_at: string;
+  restaurant_id: string; items: any; created_at: string; rider_id: string | null;
 };
 
 const parcelStatuses = ["pending", "rider_assigned", "picked_up", "delivered", "cancelled"] as const;
@@ -40,11 +42,20 @@ const statusColor: Record<string, string> = {
 type Tab = "parcel" | "food";
 
 function AdminDashboard() {
+  const { user } = Route.useRouteContext();
   const [tab, setTab] = useState<Tab>("parcel");
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
+
+  async function assignSelf(orderType: "food" | "parcel", id: string) {
+    const table = orderType === "parcel" ? "parcels" : "food_orders";
+    const { error } = await supabase.from(table).update({ rider_id: user.id }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("আপনি রাইডার হিসেবে যুক্ত হয়েছেন");
+  }
 
   useEffect(() => {
     supabase.from("parcels").select("*").order("created_at", { ascending: false }).limit(200)
@@ -214,8 +225,23 @@ function AdminDashboard() {
                       {r.item_type} · {r.size} · {new Date(r.created_at).toLocaleString("bn-BD")}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <div className="text-sm font-bold text-primary">৳{r.delivery_charge}</div>
+                    <button
+                      onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code })}
+                      className="grid h-9 w-9 place-items-center rounded-lg border border-border hover:bg-muted"
+                      aria-label="চ্যাট"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => assignSelf("parcel", r.id)}
+                      disabled={r.rider_id === user.id}
+                      className="inline-flex h-9 items-center gap-1 rounded-lg border border-border px-2 text-xs disabled:opacity-60"
+                    >
+                      {r.rider_id === user.id ? <Check className="h-3.5 w-3.5" /> : <UserPlus className="h-3.5 w-3.5" />}
+                      <span className="font-bangla">{r.rider_id === user.id ? "নিয়োগ" : "নিন"}</span>
+                    </button>
                     <Select value={r.status} onValueChange={(v) => updateParcelStatus(r.id, v)}>
                       <SelectTrigger className="h-9 w-40 rounded-lg text-xs">
                         <SelectValue />
@@ -255,8 +281,23 @@ function AdminDashboard() {
                       {itemsArr.map((i: any) => `${i.name}×${i.qty}`).join(", ")} · {new Date(r.created_at).toLocaleString("bn-BD")}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <div className="text-sm font-bold text-primary">৳{r.total}</div>
+                    <button
+                      onClick={() => setChat({ type: "food", id: r.id, code: r.order_code })}
+                      className="grid h-9 w-9 place-items-center rounded-lg border border-border hover:bg-muted"
+                      aria-label="চ্যাট"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => assignSelf("food", r.id)}
+                      disabled={r.rider_id === user.id}
+                      className="inline-flex h-9 items-center gap-1 rounded-lg border border-border px-2 text-xs disabled:opacity-60"
+                    >
+                      {r.rider_id === user.id ? <Check className="h-3.5 w-3.5" /> : <UserPlus className="h-3.5 w-3.5" />}
+                      <span className="font-bangla">{r.rider_id === user.id ? "নিয়োগ" : "নিন"}</span>
+                    </button>
                     <Select value={r.status} onValueChange={(v) => updateFoodStatus(r.id, v)}>
                       <SelectTrigger className="h-9 w-40 rounded-lg text-xs">
                         <SelectValue />
@@ -272,6 +313,24 @@ function AdminDashboard() {
           </div>
         )}
       </div>
+
+      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) setChat(null); }}>
+        <DialogContent className="max-w-md p-0 sm:p-0">
+          <DialogHeader className="px-5 pt-5">
+            <DialogTitle className="font-bangla">অর্ডার {chat?.code}</DialogTitle>
+          </DialogHeader>
+          <div className="px-3 pb-3">
+            {chat && (
+              <OrderChat
+                orderType={chat.type}
+                orderId={chat.id}
+                currentUserId={user.id}
+                otherPartyName="কাস্টমার"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -5,9 +5,11 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Package, ArrowLeft, Inbox, UtensilsCrossed, Star, Search, RotateCw } from "lucide-react";
+import { Package, ArrowLeft, Inbox, UtensilsCrossed, Star, Search, RotateCw, MessageCircle } from "lucide-react";
 import { StarDisplay } from "@/components/Stars";
 import { ReviewDialog } from "@/components/ReviewDialog";
+import { OrderChat } from "@/components/OrderChat";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cart } from "@/lib/cart";
 import { toast } from "sonner";
 
@@ -18,16 +20,17 @@ export const Route = createFileRoute("/_authenticated/orders")({
 
 type Parcel = {
   id: string; order_code: string; status: string; delivery_charge: number;
-  sender_hall: string; receiver_hall: string; created_at: string;
+  sender_hall: string; receiver_hall: string; created_at: string; rider_id: string | null;
 };
 type OrderItem = { id: string; name: string; price: number; qty: number };
 type FoodOrder = {
   id: string; order_code: string; status: string; total: number;
   receiver_hall: string; restaurant_id: string | null; created_at: string;
-  items: OrderItem[];
+  items: OrderItem[]; rider_id: string | null;
 };
 
 type ReviewRow = { order_id: string; rating: number };
+type ChatTarget = { type: "food" | "parcel"; id: string; code: string; hasRider: boolean };
 
 const parcelStatus: Record<string, { label: string; className: string }> = {
   pending: { label: "অপেক্ষমাণ", className: "bg-muted text-muted-foreground" },
@@ -57,15 +60,16 @@ function OrdersPage() {
   const [reviewFor, setReviewFor] = useState<FoodOrder | null>(null);
   const [q, setQ] = useState("");
   const [reordering, setReordering] = useState<string | null>(null);
+  const [chat, setChat] = useState<ChatTarget | null>(null);
 
   useEffect(() => {
     supabase.from("parcels")
-      .select("id, order_code, status, delivery_charge, sender_hall, receiver_hall, created_at")
+      .select("id, order_code, status, delivery_charge, sender_hall, receiver_hall, created_at, rider_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .then(({ data }) => setParcels((data as Parcel[]) ?? []));
     supabase.from("food_orders")
-      .select("id, order_code, status, total, receiver_hall, restaurant_id, created_at, items")
+      .select("id, order_code, status, total, receiver_hall, restaurant_id, created_at, items, rider_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .then(({ data }) => setFoods(((data ?? []) as unknown) as FoodOrder[]));
@@ -165,6 +169,7 @@ function OrdersPage() {
               if (filtered.length === 0) return <p className="py-10 text-center font-bangla text-sm text-muted-foreground">কিছু পাওয়া যায়নি</p>;
               return filtered.map((r) => {
                 const s = parcelStatus[r.status] ?? parcelStatus.pending!;
+                const canChat = r.status !== "cancelled" && r.status !== "delivered";
                 return (
                   <Card
                     key={r.id}
@@ -175,6 +180,19 @@ function OrdersPage() {
                     statusLabel={s.label}
                     statusClass={s.className}
                     amount={r.delivery_charge}
+                    footer={
+                      canChat ? (
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <button
+                            onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
+                          >
+                            <MessageCircle className="h-3.5 w-3.5" />
+                            <span className="font-bangla">রাইডার চ্যাট</span>
+                          </button>
+                        </div>
+                      ) : null
+                    }
                   />
                 );
               });
@@ -196,6 +214,7 @@ function OrdersPage() {
               const rated = ratings[r.id];
               const canRate = r.status === "delivered" && !rated;
               const canReorder = r.restaurant_id && Array.isArray(r.items) && r.items.length > 0;
+              const canChat = r.status !== "cancelled" && r.status !== "delivered";
               return (
                 <Card
                   key={r.id}
@@ -233,6 +252,15 @@ function OrdersPage() {
                           <span className="font-bangla">আবার অর্ডার</span>
                         </button>
                       )}
+                      {canChat && (
+                        <button
+                          onClick={() => setChat({ type: "food", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
+                        >
+                          <MessageCircle className="h-3.5 w-3.5" />
+                          <span className="font-bangla">রাইডার চ্যাট</span>
+                        </button>
+                      )}
                     </div>
                   }
                 />
@@ -256,8 +284,29 @@ function OrdersPage() {
         />
       )}
 
+      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) setChat(null); }}>
+        <DialogContent className="max-w-md p-0 sm:p-0">
+          <DialogHeader className="px-5 pt-5">
+            <DialogTitle className="font-bangla">অর্ডার {chat?.code}</DialogTitle>
+          </DialogHeader>
+          <div className="px-3 pb-3">
+            {chat && (
+              <OrderChat
+                orderType={chat.type}
+                orderId={chat.id}
+                currentUserId={user.id}
+                otherPartyName={chat.hasRider ? "রাইডার" : "সাপোর্ট"}
+                disabled={!chat.hasRider}
+                disabledReason="রাইডার নিয়োগ হলে চ্যাট শুরু হবে"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <FloatingActions />
       <MobileBottomNav />
+
     </div>
   );
 }
