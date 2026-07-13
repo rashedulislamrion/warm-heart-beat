@@ -270,7 +270,7 @@ function AnalyticsPage() {
 
       {loading ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />)}
+          {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />)}
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -278,6 +278,10 @@ function AnalyticsPage() {
           <Kpi Icon={TrendingUp} label="অর্ডার" value={kpis.totalOrders} />
           <Kpi Icon={Package} label="ডেলিভার্ড" value={kpis.delivered} />
           <Kpi Icon={UtensilsCrossed} label="গড় মূল্য" value={`৳${kpis.aov}`} />
+          <Kpi Icon={Timer} label="গড় ডেলিভারি" value={`${kpis.avgDeliveryMin}m`} />
+          <Kpi Icon={XCircle} label="ক্যান্সেল রেট" value={`${kpis.cancelRate}%`} />
+          <Kpi Icon={Star} label="গড় রেটিং" value={kpis.avgRating || "—"} />
+          <Kpi Icon={Bike} label="সক্রিয় রাইডার" value={topRiders.length} />
         </div>
       )}
 
