@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { UtensilsCrossed, Package, ArrowRight, Sparkles, Clock, MapPin, Shield } from "lucide-react";
+import { UtensilsCrossed, Package, ArrowRight, Sparkles, Clock, MapPin, Shield, Search, Bike } from "lucide-react";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
@@ -122,6 +122,38 @@ function Home() {
             <div className="font-bangla text-[11px] text-muted-foreground">{sub}</div>
           </div>
         ))}
+      </section>
+
+      {/* Secondary actions */}
+      <section className="mx-auto mt-6 grid max-w-5xl grid-cols-2 gap-3 px-4 md:mt-8 md:gap-4 md:px-8">
+        <Link
+          to="/track"
+          className="animate-fade-up group flex items-center gap-3 rounded-2xl border border-border bg-card/80 p-4 backdrop-blur-sm transition-colors hover:bg-card"
+          style={{ animationDelay: "540ms" }}
+        >
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+            <Search className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <div className="font-bangla text-sm font-bold">অর্ডার ট্র্যাক</div>
+            <div className="font-bangla truncate text-[11px] text-muted-foreground">কোড দিয়ে অবস্থা দেখুন</div>
+          </div>
+          <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+        </Link>
+        <Link
+          to="/rider"
+          className="animate-fade-up group flex items-center gap-3 rounded-2xl border border-border bg-card/80 p-4 backdrop-blur-sm transition-colors hover:bg-card"
+          style={{ animationDelay: "600ms" }}
+        >
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent/10 text-accent">
+            <Bike className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <div className="font-bangla text-sm font-bold">রাইডার হোন</div>
+            <div className="font-bangla truncate text-[11px] text-muted-foreground">আয় করুন ক্লাসের ফাঁকে</div>
+          </div>
+          <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+        </Link>
       </section>
 
       <p className="mt-12 text-center font-bangla text-xs text-muted-foreground">
