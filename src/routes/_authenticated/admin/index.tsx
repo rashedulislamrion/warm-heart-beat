@@ -74,6 +74,14 @@ function AdminDashboard() {
     supabase.from("food_orders").select("*").order("created_at", { ascending: false }).limit(200)
       .then(({ data }) => setFoods((data as FoodOrder[]) ?? []));
 
+    (async () => {
+      const { data: roles } = await supabase.from("user_roles").select("user_id").eq("role", "rider");
+      const ids = (roles ?? []).map((r: any) => r.user_id);
+      if (ids.length === 0) { setRiders([]); return; }
+      const { data: profs } = await supabase.from("profiles").select("id, full_name, phone").in("id", ids);
+      setRiders((profs as Rider[]) ?? []);
+    })();
+
     const ch1 = supabase
       .channel("admin-parcels")
       .on("postgres_changes", { event: "*", schema: "public", table: "parcels" }, (payload) => {
