@@ -53,6 +53,12 @@ function AdminDashboard() {
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
+  const { countFor, clearFor, unmute } = useUnreadMessages(user.id);
+
+  function openChat(target: { type: "food" | "parcel"; id: string; code: string }) {
+    clearFor(target.type, target.id);
+    setChat(target);
+  }
 
   async function assignRider(orderType: "food" | "parcel", id: string, riderId: string | null) {
     const table = orderType === "parcel" ? "parcels" : "food_orders";
