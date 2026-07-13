@@ -33,10 +33,12 @@ type FoodOrder = {
   created_at: string; scheduled_for: string | null;
 };
 
+// Restaurant only controls up to "preparing". After that, a rider claims
+// and drives picked_up → delivered from the rider hub.
 const NEXT_STATUS: Record<string, string | null> = {
   pending: "confirmed",
   confirmed: "preparing",
-  preparing: "picked_up",
+  preparing: null,
   picked_up: null,
   delivered: null,
   cancelled: null,
