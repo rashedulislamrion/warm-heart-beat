@@ -26,6 +26,7 @@ import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminWalletRouteImport } from './routes/_authenticated/admin/wallet'
 import { Route as AuthenticatedAdminRidersRouteImport } from './routes/_authenticated/admin/riders'
 import { Route as AuthenticatedAdminRestaurantsRouteImport } from './routes/_authenticated/admin/restaurants'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
@@ -116,6 +117,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminWalletRoute =
+  AuthenticatedAdminWalletRouteImport.update({
+    id: '/wallet',
+    path: '/wallet',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminRidersRoute =
   AuthenticatedAdminRidersRouteImport.update({
     id: '/riders',
@@ -159,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/admin/riders': typeof AuthenticatedAdminRidersRoute
+  '/admin/wallet': typeof AuthenticatedAdminWalletRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/order-push': typeof ApiPublicHooksOrderPushRoute
 }
@@ -180,6 +188,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/admin/riders': typeof AuthenticatedAdminRidersRoute
+  '/admin/wallet': typeof AuthenticatedAdminWalletRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/order-push': typeof ApiPublicHooksOrderPushRoute
 }
@@ -204,6 +213,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/_authenticated/admin/riders': typeof AuthenticatedAdminRidersRoute
+  '/_authenticated/admin/wallet': typeof AuthenticatedAdminWalletRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/order-push': typeof ApiPublicHooksOrderPushRoute
 }
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/restaurants'
     | '/admin/riders'
+    | '/admin/wallet'
     | '/admin/'
     | '/api/public/hooks/order-push'
   fileRoutesByTo: FileRoutesByTo
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/restaurants'
     | '/admin/riders'
+    | '/admin/wallet'
     | '/admin'
     | '/api/public/hooks/order-push'
   id:
@@ -272,6 +284,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/restaurants'
     | '/_authenticated/admin/riders'
+    | '/_authenticated/admin/wallet'
     | '/_authenticated/admin/'
     | '/api/public/hooks/order-push'
   fileRoutesById: FileRoutesById
@@ -407,6 +420,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/wallet': {
+      id: '/_authenticated/admin/wallet'
+      path: '/wallet'
+      fullPath: '/admin/wallet'
+      preLoaderRoute: typeof AuthenticatedAdminWalletRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/riders': {
       id: '/_authenticated/admin/riders'
       path: '/riders'
@@ -442,6 +462,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminRestaurantsRoute: typeof AuthenticatedAdminRestaurantsRoute
   AuthenticatedAdminRidersRoute: typeof AuthenticatedAdminRidersRoute
+  AuthenticatedAdminWalletRoute: typeof AuthenticatedAdminWalletRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -450,6 +471,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminRestaurantsRoute: AuthenticatedAdminRestaurantsRoute,
     AuthenticatedAdminRidersRoute: AuthenticatedAdminRidersRoute,
+    AuthenticatedAdminWalletRoute: AuthenticatedAdminWalletRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
