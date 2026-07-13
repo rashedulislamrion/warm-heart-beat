@@ -236,31 +236,7 @@ function RestaurantPage() {
             <MessageSquare className="h-4 w-4" />
             রিভিউ
           </h2>
-          {reviews === null ? (
-            <div className="space-y-3">
-              {[0, 1].map((i) => <Skeleton key={i} className="h-20 w-full rounded-2xl" />)}
-            </div>
-          ) : reviews.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border p-6 text-center">
-              <p className="font-bangla text-sm text-muted-foreground">এখনও কোনো রিভিউ নেই</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {reviews.map((rv) => (
-                <div key={rv.id} className="rounded-2xl border border-border bg-card p-4 shadow-card">
-                  <div className="flex items-center justify-between">
-                    <StarDisplay value={rv.rating} size={14} />
-                    <span className="text-[11px] text-muted-foreground">
-                      {new Date(rv.created_at).toLocaleDateString("bn-BD")}
-                    </span>
-                  </div>
-                  {rv.comment && (
-                    <p className="mt-2 font-bangla text-sm leading-relaxed">{rv.comment}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+          <ReviewList reviews={reviews} />
         </div>
       </div>
 
