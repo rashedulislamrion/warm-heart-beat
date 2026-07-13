@@ -457,8 +457,11 @@ function ActiveFood({ f, busy, unread, onNext, onChat }: { f: FoodOrder; busy: b
             <Check className="mr-1 h-4 w-4" /> <span className="font-bangla">{next.label}</span>
           </Button>
         )}
-        <Button onClick={onChat} size="sm" variant="outline" className="rounded-full">
+        <Button onClick={onChat} size="sm" variant="outline" className="relative rounded-full">
           <MessageCircle className="mr-1 h-4 w-4" /> <span className="font-bangla">চ্যাট</span>
+          {unread > 0 && (
+            <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{unread}</span>
+          )}
         </Button>
       </div>
     </div>
