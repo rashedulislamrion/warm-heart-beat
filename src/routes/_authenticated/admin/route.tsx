@@ -55,6 +55,7 @@ function AdminLayout() {
     { to: "/admin/analytics", label: "Analytics", Icon: BarChart3 },
     { to: "/admin/restaurants", label: "রেস্টুরেন্ট", Icon: Store },
     { to: "/admin/riders", label: "রাইডার", Icon: Bike },
+    { to: "/admin/wallet", label: "ওয়ালেট", Icon: Wallet },
   ] as const;
 
   return (
