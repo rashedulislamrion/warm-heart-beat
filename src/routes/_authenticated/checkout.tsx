@@ -324,6 +324,16 @@ function CheckoutPage() {
           </div>
         </div>
 
+        <div className="rounded-3xl border border-border bg-card p-5 shadow-card">
+          <SchedulePicker value={schedule} onChange={setSchedule} />
+          {schedule.mode === "later" && schedule.iso && (
+            <div className="mt-3 flex items-center gap-2 rounded-xl bg-accent/10 p-3 text-sm text-accent">
+              <Clock className="h-4 w-4" />
+              <span className="font-bangla">{formatSchedule(schedule.iso)} এ ডেলিভারি হবে</span>
+            </div>
+          )}
+        </div>
+
         <PromoAndCredits subtotal={subtotal} orderType="food" onChange={onDiscountsChange} />
 
         <div className="rounded-3xl border border-border bg-card p-5 shadow-card">
