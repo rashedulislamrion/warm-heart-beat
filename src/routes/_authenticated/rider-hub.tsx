@@ -53,6 +53,12 @@ function RiderHub() {
   const [busy, setBusy] = useState<string | null>(null);
   const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
   const [rating, setRating] = useState<{ avg: number; count: number } | null>(null);
+  const { countFor, clearFor, unmute } = useUnreadMessages(user.id);
+
+  function openChat(target: { type: "food" | "parcel"; id: string; code: string }) {
+    clearFor(target.type, target.id);
+    setChat(target);
+  }
 
   useEffect(() => {
     (async () => {
