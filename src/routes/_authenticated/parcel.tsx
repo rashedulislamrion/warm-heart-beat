@@ -191,8 +191,8 @@ function ParcelFlow() {
         <div className="rounded-3xl border border-border/60 bg-card/90 p-5 shadow-card backdrop-blur-lg md:p-8">
           {step === 1 && <SenderStep data={data} set={set} />}
           {step === 2 && <ReceiverStep data={data} set={set} />}
-          {step === 3 && <DetailsStep data={data} set={set} />}
-          {step === 4 && <ReviewStep data={data} charge={charge} />}
+          {step === 3 && <DetailsStep data={data} set={set} schedule={schedule} setSchedule={setSchedule} />}
+          {step === 4 && <ReviewStep data={data} charge={charge} schedule={schedule} />}
 
           <div className="mt-8 flex gap-3">
             {step > 1 && (
