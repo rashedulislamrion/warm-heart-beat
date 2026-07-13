@@ -152,6 +152,7 @@ function ParcelFlow() {
     setSubmitting(false);
     if (error || !inserted) return toast.error(error?.message ?? "অর্ডার ব্যর্থ");
     setOrderCode(inserted.order_code);
+    fireConfetti();
     toast.success("অর্ডার কনফার্ম হয়েছে! 🎉");
   }
 
