@@ -39,6 +39,7 @@ function FoodLayout() {
 
 function FoodIndex() {
   const [rows, setRows] = useState<Restaurant[] | null>(null);
+  const [ratings, setRatings] = useState<Record<string, { avg: number; count: number }>>({});
   const items = useCart();
   const count = cartCount(items);
   const total = cartTotal(items);
@@ -49,6 +50,13 @@ function FoodIndex() {
       .select("id, name, description, image_url, cuisine, rating, delivery_time_min, min_order, is_open")
       .order("rating", { ascending: false })
       .then(({ data }) => setRows((data as Restaurant[]) ?? []));
+    (supabase.rpc as any)("restaurant_ratings").then(({ data }: { data: any[] | null }) => {
+      const map: Record<string, { avg: number; count: number }> = {};
+      (data ?? []).forEach((r) => {
+        map[r.restaurant_id] = { avg: Number(r.avg_rating) || 0, count: Number(r.review_count) || 0 };
+      });
+      setRatings(map);
+    });
   }, []);
 
   return (
