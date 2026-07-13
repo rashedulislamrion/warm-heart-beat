@@ -313,6 +313,24 @@ function AdminDashboard() {
           </div>
         )}
       </div>
+
+      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) setChat(null); }}>
+        <DialogContent className="max-w-md p-0 sm:p-0">
+          <DialogHeader className="px-5 pt-5">
+            <DialogTitle className="font-bangla">অর্ডার {chat?.code}</DialogTitle>
+          </DialogHeader>
+          <div className="px-3 pb-3">
+            {chat && (
+              <OrderChat
+                orderType={chat.type}
+                orderId={chat.id}
+                currentUserId={user.id}
+                otherPartyName="কাস্টমার"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
