@@ -100,6 +100,7 @@ function CheckoutPage() {
     if (error || !data) return toast.error(error?.message ?? "অর্ডার ব্যর্থ");
     cart.clear();
     setOrderCode(data.order_code);
+    fireConfetti();
     toast.success("অর্ডার কনফার্ম হয়েছে! 🎉");
   }
 
