@@ -1,24 +1,135 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { UtensilsCrossed, Package, ArrowRight, Sparkles, Clock, MapPin, Shield } from "lucide-react";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { FloatingActions } from "@/components/FloatingActions";
+import { Logo } from "@/components/Logo";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "পায়রা — CU'র নিজস্ব ডেলিভারি প্ল্যাটফর্ম" },
+      { name: "description", content: "চট্টগ্রাম বিশ্ববিদ্যালয়ের খাবার ও পার্সেল ডেলিভারি। ছাত্রদের দ্বারা, ছাত্রদের জন্য।" },
+    ],
+  }),
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen gradient-hero pb-24 md:pb-8">
+      {/* Header */}
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 pt-6 md:px-8">
+        <Logo />
+        <Link
+          to="/auth"
+          className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-semibold backdrop-blur-md transition-colors hover:bg-card"
+        >
+          লগইন
+        </Link>
+      </header>
+
+      {/* Hero */}
+      <section className="mx-auto max-w-6xl px-4 pt-10 text-center md:px-8 md:pt-16">
+        <div className="animate-fade-up mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary">
+          <Sparkles className="h-3.5 w-3.5" />
+          <span className="font-bangla">চট্টগ্রাম বিশ্ববিদ্যালয়ের ছাত্রদের জন্য</span>
+        </div>
+        <h1 className="animate-fade-up font-bangla text-4xl font-extrabold leading-tight tracking-tight md:text-6xl" style={{ animationDelay: "60ms" }}>
+          ক্যাম্পাসে যেকোনো কিছু <br />
+          <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            মিনিটেই পৌঁছে দিন
+          </span>
+        </h1>
+        <p className="animate-fade-up mx-auto mt-4 max-w-xl font-bangla text-base text-muted-foreground md:text-lg" style={{ animationDelay: "120ms" }}>
+          CU'র নিজস্ব ডেলিভারি প্ল্যাটফর্ম • Students Delivering for Students
+        </p>
+
+        {/* Live riders */}
+        <div className="animate-fade-up mx-auto mt-6 inline-flex items-center gap-2 rounded-full bg-success/10 px-4 py-2 text-sm font-medium text-success" style={{ animationDelay: "180ms" }}>
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+          </span>
+          <span className="font-bangla">এখন সক্রিয় রাইডার: <b>১২</b> জন</span>
+        </div>
+      </section>
+
+      {/* Service Cards */}
+      <section className="mx-auto mt-12 grid max-w-5xl gap-4 px-4 md:mt-16 md:grid-cols-2 md:gap-6 md:px-8">
+        {/* Parcel — highlighted */}
+        <Link
+          to="/parcel"
+          className="animate-fade-up group relative overflow-hidden rounded-3xl gradient-primary p-6 text-primary-foreground shadow-soft transition-all hover:-translate-y-1 hover:shadow-warm md:order-2 md:p-8"
+          style={{ animationDelay: "240ms" }}
+        >
+          <div className="absolute -right-6 -top-6 grid h-32 w-32 place-items-center rounded-full bg-white/10 backdrop-blur-sm md:h-40 md:w-40">
+            <Package className="h-14 w-14 opacity-90 md:h-20 md:w-20" />
+          </div>
+          <span className="inline-flex rounded-full bg-white/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider backdrop-blur-sm">
+            জনপ্রিয় ⚡
+          </span>
+          <h2 className="mt-16 font-bangla text-3xl font-extrabold md:mt-20 md:text-4xl">
+            পার্সেল পাঠান
+          </h2>
+          <p className="mt-2 font-bangla text-primary-foreground/85">
+            হল থেকে হল, ২০ টাকা থেকে শুরু
+          </p>
+          <div className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-transform group-hover:gap-3">
+            <span className="font-bangla">এখনই পাঠান</span>
+            <ArrowRight className="h-4 w-4" />
+          </div>
+        </Link>
+
+        {/* Food */}
+        <Link
+          to="/food"
+          className="animate-fade-up group relative overflow-hidden rounded-3xl gradient-accent p-6 text-accent-foreground shadow-warm transition-all hover:-translate-y-1 md:order-1 md:p-8"
+          style={{ animationDelay: "300ms" }}
+        >
+          <div className="absolute -right-6 -top-6 grid h-32 w-32 place-items-center rounded-full bg-white/15 backdrop-blur-sm md:h-40 md:w-40">
+            <UtensilsCrossed className="h-14 w-14 opacity-95 md:h-20 md:w-20" />
+          </div>
+          <span className="inline-flex rounded-full bg-white/25 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider backdrop-blur-sm">
+            শীঘ্রই আসছে
+          </span>
+          <h2 className="mt-16 font-bangla text-3xl font-extrabold md:mt-20 md:text-4xl">
+            খাবার অর্ডার
+          </h2>
+          <p className="mt-2 font-bangla text-accent-foreground/90">
+            ৬টি ক্যাম্পাস রেস্টুরেন্ট থেকে
+          </p>
+          <div className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-white/25 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-transform group-hover:gap-3">
+            <span className="font-bangla">দেখুন</span>
+            <ArrowRight className="h-4 w-4" />
+          </div>
+        </Link>
+      </section>
+
+      {/* Feature strip */}
+      <section className="mx-auto mt-12 grid max-w-5xl grid-cols-3 gap-3 px-4 md:mt-16 md:gap-6 md:px-8">
+        {[
+          { icon: Clock, label: "১৫-৩০ মিনিট", sub: "দ্রুত ডেলিভারি" },
+          { icon: MapPin, label: "১৫+ স্থান", sub: "সব হল কভার" },
+          { icon: Shield, label: "নিরাপদ", sub: "যাচাইকৃত রাইডার" },
+        ].map(({ icon: Icon, label, sub }, i) => (
+          <div
+            key={label}
+            className="animate-fade-up rounded-2xl border border-border/60 bg-card/70 p-4 text-center backdrop-blur-sm"
+            style={{ animationDelay: `${360 + i * 60}ms` }}
+          >
+            <Icon className="mx-auto h-5 w-5 text-primary" />
+            <div className="mt-2 font-bangla text-sm font-bold md:text-base">{label}</div>
+            <div className="font-bangla text-[11px] text-muted-foreground">{sub}</div>
+          </div>
+        ))}
+      </section>
+
+      <p className="mt-12 text-center font-bangla text-xs text-muted-foreground">
+        © পায়রা {new Date().getFullYear()} • হটলাইন: 01400065088
+      </p>
+
+      <FloatingActions />
+      <MobileBottomNav />
     </div>
   );
 }
