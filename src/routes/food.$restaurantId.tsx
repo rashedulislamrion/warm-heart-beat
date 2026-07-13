@@ -52,12 +52,7 @@ type MenuItem = {
   is_available: boolean;
 };
 
-type Review = {
-  id: string;
-  rating: number;
-  comment: string | null;
-  created_at: string;
-};
+type Review = ReviewRow;
 
 function RestaurantPage() {
   const r = Route.useLoaderData();
