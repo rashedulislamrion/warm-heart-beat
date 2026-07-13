@@ -69,14 +69,14 @@ function RiderHub() {
   useEffect(() => {
     if (state !== "ok") return;
     supabase.from("parcels")
-      .select("id, order_code, status, delivery_charge, sender_name, sender_hall, sender_phone, receiver_name, receiver_hall, receiver_phone, item_type, size, created_at, rider_id")
+      .select("id, order_code, status, delivery_charge, sender_name, sender_hall, sender_phone, receiver_name, receiver_hall, receiver_phone, item_type, size, created_at, rider_id, scheduled_for")
       .or(`rider_id.eq.${user.id},and(rider_id.is.null,status.eq.pending)`)
       .order("created_at", { ascending: false })
       .limit(100)
       .then(({ data }) => setParcels((data as Parcel[]) ?? []));
 
     supabase.from("food_orders")
-      .select("id, order_code, status, total, delivery_charge, receiver_name, receiver_hall, receiver_phone, restaurant_id, items, created_at, rider_id")
+      .select("id, order_code, status, total, delivery_charge, receiver_name, receiver_hall, receiver_phone, restaurant_id, items, created_at, rider_id, scheduled_for")
       .or(`rider_id.eq.${user.id},and(rider_id.is.null,status.in.(confirmed,preparing))`)
       .order("created_at", { ascending: false })
       .limit(100)
@@ -90,7 +90,7 @@ function RiderHub() {
     const ch1 = supabase.channel("rider-parcels")
       .on("postgres_changes", { event: "*", schema: "public", table: "parcels" }, () => {
         supabase.from("parcels")
-          .select("id, order_code, status, delivery_charge, sender_name, sender_hall, sender_phone, receiver_name, receiver_hall, receiver_phone, item_type, size, created_at, rider_id")
+          .select("id, order_code, status, delivery_charge, sender_name, sender_hall, sender_phone, receiver_name, receiver_hall, receiver_phone, item_type, size, created_at, rider_id, scheduled_for")
           .or(`rider_id.eq.${user.id},and(rider_id.is.null,status.eq.pending)`)
           .order("created_at", { ascending: false })
           .limit(100)
@@ -100,7 +100,7 @@ function RiderHub() {
     const ch2 = supabase.channel("rider-food")
       .on("postgres_changes", { event: "*", schema: "public", table: "food_orders" }, () => {
         supabase.from("food_orders")
-          .select("id, order_code, status, total, delivery_charge, receiver_name, receiver_hall, receiver_phone, restaurant_id, items, created_at, rider_id")
+          .select("id, order_code, status, total, delivery_charge, receiver_name, receiver_hall, receiver_phone, restaurant_id, items, created_at, rider_id, scheduled_for")
           .or(`rider_id.eq.${user.id},and(rider_id.is.null,status.in.(confirmed,preparing))`)
           .order("created_at", { ascending: false })
           .limit(100)
