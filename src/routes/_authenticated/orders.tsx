@@ -361,12 +361,14 @@ function OrdersPage() {
 }
 
 function Card({
-  icon, title, subtitle, date, statusLabel, statusClass, amount, accent, footer,
+  icon, title, subtitle, date, statusLabel, statusClass, amount, accent, footer, scheduledFor,
 }: {
   icon: React.ReactNode; title: string; subtitle: string; date: string;
   statusLabel: string; statusClass: string; amount: number; accent?: boolean;
-  footer?: React.ReactNode;
+  footer?: React.ReactNode; scheduledFor?: string | null;
 }) {
+  const scheduled = scheduledFor ? new Date(scheduledFor) : null;
+  const isFuture = scheduled ? scheduled.getTime() > Date.now() : false;
   return (
     <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
       <div className="flex items-start justify-between gap-3">
@@ -380,6 +382,15 @@ function Card({
             <div className="mt-1 text-[11px] text-muted-foreground">
               {new Date(date).toLocaleString("bn-BD")}
             </div>
+            {scheduled && (
+              <div className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${isFuture ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"}`}>
+                <span>🕒</span>
+                <span className="font-bangla">
+                  {isFuture ? "নির্ধারিত: " : "নির্ধারিত ছিল: "}
+                  {scheduled.toLocaleString("bn-BD", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true })}
+                </span>
+              </div>
+            )}
           </div>
         </div>
         <div className="text-right">
