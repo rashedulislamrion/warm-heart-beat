@@ -374,6 +374,8 @@ function DetailsStep({ data, set, schedule, setSchedule }: { data: ParcelState; 
           maxLength={500}
         />
       </Field>
+
+      <SchedulePicker value={schedule} onChange={setSchedule} />
     </div>
   );
 }
