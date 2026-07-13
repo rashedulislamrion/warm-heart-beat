@@ -434,3 +434,27 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </div>
   );
 }
+
+function ReviewsTab({ restaurantId }: { restaurantId: string }) {
+  const [reviews, setReviews] = useState<ReviewRow[] | null>(null);
+
+  async function load() {
+    const { data } = await supabase
+      .from("reviews" as any)
+      .select("id, rating, comment, created_at, photo_urls, owner_reply, owner_reply_at, rider_reply, rider_reply_at, user_id")
+      .eq("restaurant_id", restaurantId)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    setReviews(((data ?? []) as unknown) as ReviewRow[]);
+  }
+  useEffect(() => { load(); }, [restaurantId]);
+
+  return (
+    <div className="space-y-4">
+      <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+        <MessageSquare className="h-4 w-4" /> কাস্টমার রিভিউ
+      </h2>
+      <ReviewList reviews={reviews} canReplyOwner onReplied={load} />
+    </div>
+  );
+}
