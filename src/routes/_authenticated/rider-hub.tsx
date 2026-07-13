@@ -140,23 +140,51 @@ function RiderHub() {
 
   async function claimParcel(p: Parcel) {
     setBusy(p.id);
-    const { error } = await supabase.from("parcels")
+    const { data, error } = await supabase.from("parcels")
       .update({ rider_id: user.id, status: "rider_assigned" })
-      .eq("id", p.id).is("rider_id", null);
+      .eq("id", p.id).is("rider_id", null)
+      .select("id");
     setBusy(null);
     if (error) return toast.error(error.message);
+    if (!data || data.length === 0) {
+      toast.error("দুঃখিত, অন্য রাইডার আগেই নিয়েছেন");
+      return;
+    }
     toast.success("অর্ডার নেওয়া হয়েছে");
     setTab("active");
   }
   async function claimFood(f: FoodOrder) {
     setBusy(f.id);
-    const { error } = await supabase.from("food_orders")
+    const { data, error } = await supabase.from("food_orders")
       .update({ rider_id: user.id })
-      .eq("id", f.id).is("rider_id", null);
+      .eq("id", f.id).is("rider_id", null)
+      .select("id");
     setBusy(null);
     if (error) return toast.error(error.message);
+    if (!data || data.length === 0) {
+      toast.error("দুঃখিত, অন্য রাইডার আগেই নিয়েছেন");
+      return;
+    }
     toast.success("অর্ডার নেওয়া হয়েছে");
     setTab("active");
+  }
+  async function releaseParcel(p: Parcel) {
+    if (!window.confirm("অর্ডার ছেড়ে দিতে চান?")) return;
+    setBusy(p.id);
+    const { error } = await (supabase.rpc as any)("release_order", { _order_type: "parcel", _order_id: p.id });
+    setBusy(null);
+    if (error) return toast.error(error.message);
+    toast.success("অর্ডার ছেড়ে দেওয়া হয়েছে");
+    setTab("available");
+  }
+  async function releaseFood(f: FoodOrder) {
+    if (!window.confirm("অর্ডার ছেড়ে দিতে চান?")) return;
+    setBusy(f.id);
+    const { error } = await (supabase.rpc as any)("release_order", { _order_type: "food", _order_id: f.id });
+    setBusy(null);
+    if (error) return toast.error(error.message);
+    toast.success("অর্ডার ছেড়ে দেওয়া হয়েছে");
+    setTab("available");
   }
   async function updateParcelStatus(p: Parcel, next: string) {
     setBusy(p.id);
