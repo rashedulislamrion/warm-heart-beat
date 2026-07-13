@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { StarDisplay } from "@/components/Stars";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 export const Route = createFileRoute("/_authenticated/rider-hub")({
   head: () => ({ meta: [{ title: "রাইডার ড্যাশবোর্ড — পায়রা" }] }),
