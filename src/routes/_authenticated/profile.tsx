@@ -74,6 +74,16 @@ function ProfilePage() {
               <span className="font-bangla">এডিট করুন</span>
             </Link>
 
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 px-4 py-3 text-sm font-semibold text-primary hover:bg-primary/15"
+              >
+                <Shield className="h-4 w-4" />
+                <span className="font-bangla">অ্যাডমিন ড্যাশবোর্ড</span>
+              </Link>
+            )}
+
             <Button
               variant="ghost"
               onClick={signOut}
