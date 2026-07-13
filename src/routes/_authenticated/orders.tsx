@@ -5,9 +5,11 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Package, ArrowLeft, Inbox, UtensilsCrossed, Star, Search, RotateCw } from "lucide-react";
+import { Package, ArrowLeft, Inbox, UtensilsCrossed, Star, Search, RotateCw, MessageCircle } from "lucide-react";
 import { StarDisplay } from "@/components/Stars";
 import { ReviewDialog } from "@/components/ReviewDialog";
+import { OrderChat } from "@/components/OrderChat";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cart } from "@/lib/cart";
 import { toast } from "sonner";
 
