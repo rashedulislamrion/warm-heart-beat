@@ -10,6 +10,7 @@ import { StarDisplay } from "@/components/Stars";
 import { ReviewDialog } from "@/components/ReviewDialog";
 import { OrderChat } from "@/components/OrderChat";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PushNotificationToggle } from "@/components/PushNotificationToggle";
 import { cart } from "@/lib/cart";
 import { toast } from "sonner";
 
