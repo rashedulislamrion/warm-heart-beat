@@ -66,6 +66,8 @@ function RestaurantPage() {
   const items = useCart();
   const count = cartCount(items);
   const total = cartTotal(items);
+  const uid = useCurrentUserId();
+  const { ids: favIds, toggle: toggleFav } = useFavorites(uid);
 
   useEffect(() => {
     supabase
