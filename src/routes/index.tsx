@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { UtensilsCrossed, Package, ArrowRight, Sparkles, Clock, MapPin, Shield, Search, Bike } from "lucide-react";
+import { useEffect, useState } from "react";
+import { UtensilsCrossed, Package, ArrowRight, Sparkles, Clock, MapPin, Shield, Search, Bike, LayoutDashboard, User as UserIcon } from "lucide-react";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -14,18 +16,73 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+type AuthState = { loading: boolean; signedIn: boolean; dashboard: { to: string; label: string } };
+
+function useHeaderAuth(): AuthState {
+  const [state, setState] = useState<AuthState>({ loading: true, signedIn: false, dashboard: { to: "/profile", label: "প্রোফাইল" } });
+
+  useEffect(() => {
+    let cancelled = false;
+    async function resolve() {
+      const { data } = await supabase.auth.getUser();
+      const uid = data.user?.id;
+      if (!uid) {
+        if (!cancelled) setState({ loading: false, signedIn: false, dashboard: { to: "/profile", label: "প্রোফাইল" } });
+        return;
+      }
+      const [{ data: isAdmin }, { data: isRider }, { data: isOwner }] = await Promise.all([
+        supabase.rpc("has_role", { _user_id: uid, _role: "admin" }),
+        supabase.rpc("has_role", { _user_id: uid, _role: "rider" }),
+        supabase.rpc("has_role", { _user_id: uid, _role: "restaurant" }),
+      ]);
+      let dashboard = { to: "/profile", label: "প্রোফাইল" };
+      if (isAdmin) dashboard = { to: "/admin", label: "অ্যাডমিন" };
+      else if (isOwner) dashboard = { to: "/restaurant-hub", label: "রেস্টুরেন্ট" };
+      else if (isRider) dashboard = { to: "/rider-hub", label: "রাইডার" };
+      if (!cancelled) setState({ loading: false, signedIn: true, dashboard });
+    }
+    resolve();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => resolve());
+    return () => { cancelled = true; sub.subscription.unsubscribe(); };
+  }, []);
+
+  return state;
+}
+
 function Home() {
+  const auth = useHeaderAuth();
   return (
     <div className="min-h-screen gradient-hero pb-24 md:pb-8">
       {/* Header */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 pt-6 md:px-8">
         <Logo />
-        <Link
-          to="/auth"
-          className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-semibold backdrop-blur-md transition-colors hover:bg-card"
-        >
-          লগইন
-        </Link>
+        {auth.loading ? (
+          <div className="h-9 w-24 animate-pulse rounded-full bg-card/60" />
+        ) : auth.signedIn ? (
+          <div className="flex items-center gap-2">
+            <Link
+              to={auth.dashboard.to}
+              className="inline-flex items-center gap-1.5 rounded-full gradient-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:-translate-y-0.5"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              <span className="font-bangla">{auth.dashboard.label}</span>
+            </Link>
+            <Link
+              to="/profile"
+              aria-label="প্রোফাইল"
+              className="grid h-9 w-9 place-items-center rounded-full border border-border bg-card/80 backdrop-blur-md transition-colors hover:bg-card"
+            >
+              <UserIcon className="h-4 w-4" />
+            </Link>
+          </div>
+        ) : (
+          <Link
+            to="/auth"
+            className="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-semibold backdrop-blur-md transition-colors hover:bg-card"
+          >
+            লগইন
+          </Link>
+        )}
       </header>
 
       {/* Hero */}
