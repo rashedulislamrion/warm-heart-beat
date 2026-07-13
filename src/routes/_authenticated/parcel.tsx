@@ -315,7 +315,7 @@ function ReceiverStep({ data, set }: { data: ParcelState; set: SetFn }) {
   );
 }
 
-function DetailsStep({ data, set }: { data: ParcelState; set: SetFn }) {
+function DetailsStep({ data, set, schedule, setSchedule }: { data: ParcelState; set: SetFn; schedule: Schedule; setSchedule: (v: Schedule) => void }) {
   return (
     <div className="space-y-6">
       <div>
