@@ -64,12 +64,12 @@ function OrdersPage() {
 
   useEffect(() => {
     supabase.from("parcels")
-      .select("id, order_code, status, delivery_charge, sender_hall, receiver_hall, created_at")
+      .select("id, order_code, status, delivery_charge, sender_hall, receiver_hall, created_at, rider_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .then(({ data }) => setParcels((data as Parcel[]) ?? []));
     supabase.from("food_orders")
-      .select("id, order_code, status, total, receiver_hall, restaurant_id, created_at, items")
+      .select("id, order_code, status, total, receiver_hall, restaurant_id, created_at, items, rider_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .then(({ data }) => setFoods(((data ?? []) as unknown) as FoodOrder[]));
