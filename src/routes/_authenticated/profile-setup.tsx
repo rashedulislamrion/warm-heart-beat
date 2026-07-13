@@ -57,7 +57,7 @@ function ProfileSetup() {
     setLoading(true);
     const { error } = await supabase
       .from("profiles")
-      .upsert({ id: user.id, ...parsed.data, profile_complete: true });
+      .upsert({ id: user.id, ...parsed.data, profile_complete: true } as never);
     setLoading(false);
     if (error) return toast.error(error.message);
     toast.success("প্রোফাইল সংরক্ষিত হয়েছে");

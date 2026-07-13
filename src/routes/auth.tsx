@@ -13,6 +13,7 @@ import { Loader2 } from "lucide-react";
 const searchSchema = z.object({
   redirect: z.string().optional(),
   mode: z.enum(["signin", "signup"]).optional(),
+  ref: z.string().trim().max(24).optional(),
 });
 
 export const Route = createFileRoute("/auth")({
@@ -32,9 +33,22 @@ function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [referralCode, setReferralCode] = useState((search.ref ?? "").toUpperCase());
   const [loading, setLoading] = useState(false);
 
   const redirectTo = search.redirect ?? "/parcel";
+
+  async function attachReferralIfAny() {
+    const code = referralCode.trim().toUpperCase();
+    if (!code) return;
+    const { error } = await (supabase.rpc as any)("attach_referrer", { _code: code });
+    if (error) {
+      // Non-fatal: show a soft toast so user knows
+      toast(`রেফারেল কোড যুক্ত হয়নি: ${error.message}`);
+    } else {
+      toast.success("রেফারেল কোড যুক্ত হয়েছে 🎁");
+    }
+  }
 
   async function handleEmailAuth(e: React.FormEvent) {
     e.preventDefault();
@@ -52,6 +66,7 @@ function AuthPage() {
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
+        await attachReferralIfAny();
         toast.success("অ্যাকাউন্ট তৈরি হয়েছে!");
         navigate({ to: redirectTo });
       } else {
@@ -60,6 +75,7 @@ function AuthPage() {
           password: parsed.data.password,
         });
         if (error) throw error;
+        await attachReferralIfAny();
         toast.success("স্বাগতম!");
         navigate({ to: redirectTo });
       }
@@ -155,6 +171,22 @@ function AuthPage() {
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
               />
             </div>
+            {mode === "signup" && (
+              <div>
+                <Label htmlFor="ref">রেফারেল কোড (ঐচ্ছিক)</Label>
+                <Input
+                  id="ref"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                  placeholder="ABC123"
+                  maxLength={12}
+                  className="mt-1.5 h-12 rounded-xl uppercase tracking-widest"
+                />
+                <p className="mt-1 font-bangla text-[11px] text-muted-foreground">
+                  বন্ধুর কোড দিলে প্রথম অর্ডারে দু'জনেই ৳৫০ পাবেন
+                </p>
+              </div>
+            )}
             <Button
               type="submit"
               disabled={loading}

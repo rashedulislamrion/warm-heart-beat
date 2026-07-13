@@ -249,6 +249,8 @@ export type Database = {
           id: string
           phone: string | null
           profile_complete: boolean
+          referral_code: string
+          referred_by: string | null
           updated_at: string
         }
         Insert: {
@@ -260,6 +262,8 @@ export type Database = {
           id: string
           phone?: string | null
           profile_complete?: boolean
+          referral_code: string
+          referred_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -271,9 +275,94 @@ export type Database = {
           id?: string
           phone?: string | null
           profile_complete?: boolean
+          referral_code?: string
+          referred_by?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          applies_to: string
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_discount: number | null
+          min_order: number
+          per_user_limit: number
+          usage_limit: number | null
+        }
+        Insert: {
+          applies_to?: string
+          code: string
+          created_at?: string
+          discount_type: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_discount?: number | null
+          min_order?: number
+          per_user_limit?: number
+          usage_limit?: number | null
+        }
+        Update: {
+          applies_to?: string
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_discount?: number | null
+          min_order?: number
+          per_user_limit?: number
+          usage_limit?: number | null
+        }
+        Relationships: []
+      }
+      promo_redemptions: {
+        Row: {
+          created_at: string
+          discount: number
+          id: string
+          order_id: string
+          order_type: string
+          promo_code_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          discount: number
+          id?: string
+          order_id: string
+          order_type: string
+          promo_code_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          discount?: number
+          id?: string
+          order_id?: string
+          order_type?: string
+          promo_code_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_redemptions_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       restaurants: {
         Row: {
@@ -361,6 +450,33 @@ export type Database = {
           },
         ]
       }
+      user_credits: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          order_id: string | null
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          reason: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -387,12 +503,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      attach_referrer: { Args: { _code: string }; Returns: string }
+      gen_referral_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      my_credit_balance: { Args: never; Returns: number }
+      redeem_credits: {
+        Args: { _amount: number; _order_id: string; _order_type: string }
+        Returns: number
+      }
+      redeem_promo: {
+        Args: {
+          _code: string
+          _order_id: string
+          _order_type: string
+          _subtotal: number
+        }
+        Returns: number
       }
       restaurant_ratings: {
         Args: never
@@ -411,6 +543,15 @@ export type Database = {
           receiver_hall: string
           status: string
           updated_at: string
+        }[]
+      }
+      validate_promo: {
+        Args: { _code: string; _order_type: string; _subtotal: number }
+        Returns: {
+          code: string
+          discount: number
+          message: string
+          promo_id: string
         }[]
       }
     }
