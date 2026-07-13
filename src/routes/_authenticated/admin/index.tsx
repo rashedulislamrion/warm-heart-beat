@@ -267,11 +267,14 @@ function AdminDashboard() {
                   <div className="flex flex-wrap items-center gap-2">
                     <div className="text-sm font-bold text-primary">৳{r.delivery_charge}</div>
                     <button
-                      onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code })}
-                      className="grid h-9 w-9 place-items-center rounded-lg border border-border hover:bg-muted"
+                      onClick={() => openChat({ type: "parcel", id: r.id, code: r.order_code })}
+                      className="relative grid h-9 w-9 place-items-center rounded-lg border border-border hover:bg-muted"
                       aria-label="চ্যাট"
                     >
                       <MessageCircle className="h-4 w-4" />
+                      {countFor("parcel", r.id) > 0 && (
+                        <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{countFor("parcel", r.id)}</span>
+                      )}
                     </button>
                     <RiderAssign
                       riders={riders}
