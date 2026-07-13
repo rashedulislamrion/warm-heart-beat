@@ -3,8 +3,10 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { OrderChat } from "@/components/OrderChat";
 import { toast } from "sonner";
-import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search } from "lucide-react";
+import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search, MessageCircle, UserPlus, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
