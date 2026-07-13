@@ -51,7 +51,7 @@ function RestaurantHub() {
   const navigate = useNavigate();
   const [state, setState] = useState<"loading" | "ok" | "denied">("loading");
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [tab, setTab] = useState<"orders" | "menu" | "settings">("orders");
+  const [tab, setTab] = useState<"orders" | "menu" | "reviews" | "settings">("orders");
 
   useEffect(() => {
     (async () => {
