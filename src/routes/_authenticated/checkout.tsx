@@ -76,8 +76,8 @@ function CheckoutPage() {
 
   const subtotal = cartTotal(items);
   const deliveryCharge = useMemo(
-    () => (form.receiver_hall ? calculateDeliveryCharge(RESTAURANT_ORIGIN, form.receiver_hall, "small") : 30),
-    [form.receiver_hall],
+    () => (form.receiver_hall ? calculateDeliveryCharge(restaurantOrigin, form.receiver_hall, "small") : 30),
+    [form.receiver_hall, restaurantOrigin],
   );
   const totalBeforeDiscount = subtotal + deliveryCharge;
   const totalDiscount = discounts.promoDiscount + discounts.creditsUsed;
