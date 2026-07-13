@@ -179,6 +179,8 @@ function OrdersPage() {
               return filtered.map((r) => {
                 const s = parcelStatus[r.status] ?? parcelStatus.pending!;
                 const canChat = r.status !== "cancelled" && r.status !== "delivered";
+                const rated = ratings[r.id];
+                const canRate = r.status === "delivered" && !!r.rider_id && !rated;
                 return (
                   <Card
                     key={r.id}
@@ -190,15 +192,32 @@ function OrdersPage() {
                     statusClass={s.className}
                     amount={r.delivery_charge}
                     footer={
-                      canChat ? (
+                      (canChat || canRate || rated) ? (
                         <div className="mt-3 flex flex-wrap items-center gap-2">
-                          <button
-                            onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
-                          >
-                            <MessageCircle className="h-3.5 w-3.5" />
-                            <span className="font-bangla">রাইডার চ্যাট</span>
-                          </button>
+                          {canRate && (
+                            <button
+                              onClick={() => setReviewFor({ type: "parcel", order: r })}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
+                            >
+                              <Star className="h-3.5 w-3.5" />
+                              <span className="font-bangla">রাইডার রেট করুন</span>
+                            </button>
+                          )}
+                          {rated ? (
+                            <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                              <StarDisplay value={rated} size={13} />
+                              <span className="font-bangla">আপনার রেটিং</span>
+                            </div>
+                          ) : null}
+                          {canChat && (
+                            <button
+                              onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
+                            >
+                              <MessageCircle className="h-3.5 w-3.5" />
+                              <span className="font-bangla">রাইডার চ্যাট</span>
+                            </button>
+                          )}
                         </div>
                       ) : null
                     }
