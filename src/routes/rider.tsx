@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,9 @@ function RiderApply() {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [checking, setChecking] = useState(true);
+  const [existing, setExisting] = useState<{ status: string; admin_note: string | null } | null>(null);
   const [form, setForm] = useState({
     full_name: "",
     phone: "",
@@ -53,6 +56,28 @@ function RiderApply() {
     motivation: "",
   });
 
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate({ to: "/auth", search: { redirect: "/rider" } as any });
+        return;
+      }
+      setUserId(user.id);
+      const { data: prof } = await supabase.from("profiles").select("full_name, phone").eq("id", user.id).maybeSingle();
+      if (prof) {
+        setForm((f) => ({ ...f, full_name: prof.full_name ?? "", phone: prof.phone ?? "" }));
+      }
+      const { data: app } = await supabase
+        .from("rider_applications" as any)
+        .select("status, admin_note")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (app) setExisting(app as any);
+      setChecking(false);
+    })();
+  }, [navigate]);
+
   function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
   }
@@ -64,8 +89,14 @@ function RiderApply() {
       toast.error(parsed.error.issues[0]?.message ?? "ভুল ইনপুট");
       return;
     }
+    if (!userId) {
+      toast.error("লগইন প্রয়োজন");
+      navigate({ to: "/auth", search: { redirect: "/rider" } as any });
+      return;
+    }
     setSubmitting(true);
     const { error } = await supabase.from("rider_applications" as any).insert({
+      user_id: userId,
       ...parsed.data,
       hall: parsed.data.hall || null,
       student_id: parsed.data.student_id || null,
@@ -76,11 +107,46 @@ function RiderApply() {
     });
     setSubmitting(false);
     if (error) {
-      toast.error("জমা দিতে ব্যর্থ, আবার চেষ্টা করুন");
+      toast.error(error.message.includes("duplicate") ? "আপনি ইতিমধ্যে আবেদন করেছেন" : "জমা দিতে ব্যর্থ, আবার চেষ্টা করুন");
       return;
     }
     setDone(true);
+    setExisting({ status: "pending", admin_note: null });
     toast.success("আবেদন গৃহীত হয়েছে!");
+  }
+
+  if (checking) {
+    return (
+      <div className="min-h-screen gradient-hero grid place-items-center">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (existing && !done) {
+    const tone = existing.status === "approved" ? "text-success" : existing.status === "rejected" ? "text-destructive" : "text-primary";
+    const label = existing.status === "approved" ? "অনুমোদিত ✓" : existing.status === "rejected" ? "প্রত্যাখ্যাত" : "যাচাই চলছে…";
+    return (
+      <div className="min-h-screen gradient-hero grid place-items-center px-4 pb-24">
+        <div className="mx-auto max-w-md rounded-3xl border border-border bg-card p-8 text-center shadow-soft">
+          <Bike className="mx-auto h-10 w-10 text-primary" />
+          <h2 className="mt-3 font-bangla text-2xl font-extrabold">আপনার আবেদনের স্ট্যাটাস</h2>
+          <p className={`mt-2 font-bangla text-lg font-bold ${tone}`}>{label}</p>
+          {existing.admin_note && <p className="mt-2 font-bangla text-sm text-muted-foreground">{existing.admin_note}</p>}
+          {existing.status === "approved" && (
+            <Button onClick={() => navigate({ to: "/rider-hub" })} className="mt-6 h-11 rounded-xl px-6">
+              রাইডার ড্যাশবোর্ডে যান
+            </Button>
+          )}
+          {existing.status !== "approved" && (
+            <Button onClick={() => navigate({ to: "/" })} variant="outline" className="mt-6 h-11 rounded-xl px-6">
+              হোমে ফিরুন
+            </Button>
+          )}
+        </div>
+        <MobileBottomNav />
+      </div>
+    );
   }
 
   if (done) {
