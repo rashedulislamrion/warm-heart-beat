@@ -42,11 +42,20 @@ const statusColor: Record<string, string> = {
 type Tab = "parcel" | "food";
 
 function AdminDashboard() {
+  const { user } = Route.useRouteContext();
   const [tab, setTab] = useState<Tab>("parcel");
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
+
+  async function assignSelf(orderType: "food" | "parcel", id: string) {
+    const table = orderType === "parcel" ? "parcels" : "food_orders";
+    const { error } = await supabase.from(table).update({ rider_id: user.id }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("আপনি রাইডার হিসেবে যুক্ত হয়েছেন");
+  }
 
   useEffect(() => {
     supabase.from("parcels").select("*").order("created_at", { ascending: false }).limit(200)
