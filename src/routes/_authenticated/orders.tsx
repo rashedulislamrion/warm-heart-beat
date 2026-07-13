@@ -20,9 +20,11 @@ type Parcel = {
   id: string; order_code: string; status: string; delivery_charge: number;
   sender_hall: string; receiver_hall: string; created_at: string;
 };
+type OrderItem = { id: string; name: string; price: number; qty: number };
 type FoodOrder = {
   id: string; order_code: string; status: string; total: number;
   receiver_hall: string; restaurant_id: string | null; created_at: string;
+  items: OrderItem[];
 };
 
 type ReviewRow = { order_id: string; rating: number };
