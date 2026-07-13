@@ -352,7 +352,7 @@ function OrdersPage() {
         />
       )}
 
-      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) setChat(null); }}>
+      <Dialog open={!!chat} onOpenChange={(v) => { if (!v) { if (chat) unmute(chat.type, chat.id); setChat(null); } }}>
         <DialogContent className="max-w-md p-0 sm:p-0">
           <DialogHeader className="px-5 pt-5">
             <DialogTitle className="font-bangla">অর্ডার {chat?.code}</DialogTitle>
