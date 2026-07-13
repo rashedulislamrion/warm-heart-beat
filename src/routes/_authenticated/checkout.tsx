@@ -86,6 +86,15 @@ function CheckoutPage() {
   const restaurant_id = items[0]?.restaurant_id ?? null;
   const restaurant_name = items[0]?.restaurant_name ?? "";
 
+  useEffect(() => {
+    if (!restaurant_id) return;
+    supabase.from("restaurants").select("location").eq("id", restaurant_id).maybeSingle()
+      .then(({ data }) => {
+        const loc = (data as { location?: string } | null)?.location;
+        if (loc) setRestaurantOrigin(loc);
+      });
+  }, [restaurant_id]);
+
   async function submit() {
     if (!items.length || !restaurant_id) return;
     const r = schema.safeParse(form);
