@@ -85,6 +85,14 @@ function ProfilePage() {
               <span className="font-bangla">বন্ধু আনুন, ৳৫০ পান</span>
             </Link>
 
+            <Link
+              to="/wallet"
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm font-semibold hover:bg-secondary"
+            >
+              <Wallet className="h-4 w-4" />
+              <span className="font-bangla">ওয়ালেট</span>
+            </Link>
+
             {isRider && (
               <Link
                 to="/rider-hub"
