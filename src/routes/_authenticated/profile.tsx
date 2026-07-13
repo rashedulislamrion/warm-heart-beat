@@ -85,6 +85,16 @@ function ProfilePage() {
               <span className="font-bangla">বন্ধু আনুন, ৳৫০ পান</span>
             </Link>
 
+            {isRider && (
+              <Link
+                to="/rider-hub"
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent/10 px-4 py-3 text-sm font-semibold text-accent hover:bg-accent/15"
+              >
+                <Bike className="h-4 w-4" />
+                <span className="font-bangla">রাইডার ড্যাশবোর্ড</span>
+              </Link>
+            )}
+
             {isAdmin && (
               <Link
                 to="/admin"
