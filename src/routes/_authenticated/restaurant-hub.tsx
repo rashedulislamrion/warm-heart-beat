@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, Store, Plus, Pencil, Trash2, Clock, Loader2 } from "lucide-react";
+import { ArrowLeft, Store, Plus, Pencil, Trash2, Clock, Loader2, MessageSquare } from "lucide-react";
+import { ReviewList, type ReviewRow } from "@/components/ReviewList";
 
 export const Route = createFileRoute("/_authenticated/restaurant-hub")({
   head: () => ({ meta: [{ title: "রেস্টুরেন্ট ড্যাশবোর্ড — পায়রা" }] }),
