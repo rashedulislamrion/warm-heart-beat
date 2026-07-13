@@ -214,6 +214,7 @@ function OrdersPage() {
               const rated = ratings[r.id];
               const canRate = r.status === "delivered" && !rated;
               const canReorder = r.restaurant_id && Array.isArray(r.items) && r.items.length > 0;
+              const canChat = r.status !== "cancelled" && r.status !== "delivered";
               return (
                 <Card
                   key={r.id}
