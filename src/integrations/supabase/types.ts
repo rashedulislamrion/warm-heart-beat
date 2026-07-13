@@ -14,6 +14,124 @@ export type Database = {
   }
   public: {
     Tables: {
+      food_orders: {
+        Row: {
+          created_at: string
+          delivery_charge: number
+          id: string
+          items: Json
+          note: string | null
+          order_code: string
+          receiver_block_room: string | null
+          receiver_hall: string
+          receiver_landmark: string | null
+          receiver_name: string
+          receiver_phone: string
+          restaurant_id: string
+          rider_id: string | null
+          status: Database["public"]["Enums"]["food_order_status"]
+          subtotal: number
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_charge: number
+          id?: string
+          items: Json
+          note?: string | null
+          order_code?: string
+          receiver_block_room?: string | null
+          receiver_hall: string
+          receiver_landmark?: string | null
+          receiver_name: string
+          receiver_phone: string
+          restaurant_id: string
+          rider_id?: string | null
+          status?: Database["public"]["Enums"]["food_order_status"]
+          subtotal: number
+          total: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_charge?: number
+          id?: string
+          items?: Json
+          note?: string | null
+          order_code?: string
+          receiver_block_room?: string | null
+          receiver_hall?: string
+          receiver_landmark?: string | null
+          receiver_name?: string
+          receiver_phone?: string
+          restaurant_id?: string
+          rider_id?: string | null
+          status?: Database["public"]["Enums"]["food_order_status"]
+          subtotal?: number
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "food_orders_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_available: boolean
+          name: string
+          price: number
+          restaurant_id: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean
+          name: string
+          price: number
+          restaurant_id: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean
+          name?: string
+          price?: number
+          restaurant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parcels: {
         Row: {
           created_at: string
@@ -128,6 +246,48 @@ export type Database = {
         }
         Relationships: []
       }
+      restaurants: {
+        Row: {
+          created_at: string
+          cuisine: string | null
+          delivery_time_min: number
+          description: string | null
+          id: string
+          image_url: string | null
+          is_open: boolean
+          min_order: number
+          name: string
+          rating: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cuisine?: string | null
+          delivery_time_min?: number
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_open?: boolean
+          min_order?: number
+          name: string
+          rating?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cuisine?: string | null
+          delivery_time_min?: number
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_open?: boolean
+          min_order?: number
+          name?: string
+          rating?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -164,6 +324,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "rider" | "user"
+      food_order_status:
+        | "pending"
+        | "confirmed"
+        | "preparing"
+        | "picked_up"
+        | "delivered"
+        | "cancelled"
       parcel_item_type:
         | "document"
         | "medicine"
@@ -306,6 +473,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "rider", "user"],
+      food_order_status: [
+        "pending",
+        "confirmed",
+        "preparing",
+        "picked_up",
+        "delivered",
+        "cancelled",
+      ],
       parcel_item_type: [
         "document",
         "medicine",
