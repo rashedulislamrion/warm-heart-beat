@@ -14,23 +14,27 @@ import {
   CartesianGrid,
   Cell,
 } from "recharts";
-import { TrendingUp, DollarSign, UtensilsCrossed, Package, Trophy, Clock } from "lucide-react";
+import { TrendingUp, DollarSign, UtensilsCrossed, Package, Trophy, Clock, Bike, XCircle, Timer, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/analytics")({
   head: () => ({ meta: [{ title: "Analytics — পায়রা Admin" }] }),
   component: AnalyticsPage,
 });
 
-type Parcel = { id: string; delivery_charge: number; status: string; created_at: string };
+type Parcel = { id: string; delivery_charge: number; status: string; created_at: string; updated_at: string; rider_id: string | null };
 type FoodOrder = {
   id: string;
   total: number;
   status: string;
   created_at: string;
+  updated_at: string;
   restaurant_id: string | null;
+  rider_id: string | null;
   items: any;
 };
 type Restaurant = { id: string; name: string };
+type Review = { rider_id: string | null; rider_rating: number | null };
+type Profile = { id: string; full_name: string | null };
 
 const RANGE_OPTIONS = [
   { key: "7", label: "৭ দিন" },
@@ -43,6 +47,8 @@ function AnalyticsPage() {
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
   const [restaurants, setRestaurants] = useState<Record<string, string>>({});
+  const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [riderNames, setRiderNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const days = Number(range);
@@ -53,12 +59,12 @@ function AnalyticsPage() {
 
     supabase
       .from("parcels")
-      .select("id, delivery_charge, status, created_at")
+      .select("id, delivery_charge, status, created_at, updated_at, rider_id")
       .gte("created_at", sinceIso)
       .then(({ data }) => setParcels((data as Parcel[]) ?? []));
     supabase
       .from("food_orders")
-      .select("id, total, status, created_at, restaurant_id, items")
+      .select("id, total, status, created_at, updated_at, restaurant_id, rider_id, items")
       .gte("created_at", sinceIso)
       .then(({ data }) => setFoods(((data ?? []) as unknown) as FoodOrder[]));
     supabase
@@ -69,11 +75,34 @@ function AnalyticsPage() {
         ((data as Restaurant[]) ?? []).forEach((r) => (map[r.id] = r.name));
         setRestaurants(map);
       });
+    supabase
+      .from("reviews")
+      .select("rider_id, rider_rating")
+      .gte("created_at", sinceIso)
+      .then(({ data }) => setReviews((data as Review[]) ?? []));
   }, [range]);
+
+  // Load rider profile names for whichever rider_ids show up
+  useEffect(() => {
+    const ids = new Set<string>();
+    (parcels ?? []).forEach((p) => p.rider_id && ids.add(p.rider_id));
+    (foods ?? []).forEach((f) => f.rider_id && ids.add(f.rider_id));
+    const missing = [...ids].filter((id) => !(id in riderNames));
+    if (missing.length === 0) return;
+    supabase
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", missing)
+      .then(({ data }) => {
+        const next = { ...riderNames };
+        ((data as Profile[]) ?? []).forEach((p) => (next[p.id] = p.full_name ?? "—"));
+        setRiderNames(next);
+      });
+  }, [parcels, foods]);
 
   const loading = parcels === null || foods === null;
 
-  const { revenueSeries, hourSeries, topItems, topRestaurants, kpis } = useMemo(() => {
+  const { revenueSeries, hourSeries, topItems, topRestaurants, topRiders, kpis } = useMemo(() => {
     const p = parcels ?? [];
     const f = foods ?? [];
     const days = Number(range);
@@ -145,6 +174,36 @@ function AnalyticsPage() {
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
 
+    // Top riders: delivered order counts + avg rating
+    const riderMap = new Map<string, { id: string; delivered: number; earnings: number }>();
+    p.filter((r) => r.status === "delivered" && r.rider_id).forEach((r) => {
+      const cur = riderMap.get(r.rider_id!) ?? { id: r.rider_id!, delivered: 0, earnings: 0 };
+      cur.delivered += 1;
+      cur.earnings += r.delivery_charge || 0;
+      riderMap.set(r.rider_id!, cur);
+    });
+    f.filter((r) => r.status === "delivered" && r.rider_id).forEach((r) => {
+      const cur = riderMap.get(r.rider_id!) ?? { id: r.rider_id!, delivered: 0, earnings: 0 };
+      cur.delivered += 1;
+      cur.earnings += 40;
+      riderMap.set(r.rider_id!, cur);
+    });
+    const ratingMap = new Map<string, { sum: number; count: number }>();
+    (reviews ?? []).forEach((rv) => {
+      if (!rv.rider_id || rv.rider_rating == null) return;
+      const cur = ratingMap.get(rv.rider_id) ?? { sum: 0, count: 0 };
+      cur.sum += rv.rider_rating;
+      cur.count += 1;
+      ratingMap.set(rv.rider_id, cur);
+    });
+    const topRiders = Array.from(riderMap.values())
+      .map((r) => {
+        const rt = ratingMap.get(r.id);
+        return { ...r, rating: rt ? +(rt.sum / rt.count).toFixed(1) : null, reviews: rt?.count ?? 0 };
+      })
+      .sort((a, b) => b.delivered - a.delivered)
+      .slice(0, 5);
+
     const totalRevenue = revenueSeries.reduce((s, r) => s + r.total, 0);
     const totalOrders = p.length + f.length;
     const delivered =
@@ -154,15 +213,36 @@ function AnalyticsPage() {
       p.filter((r) => r.status === "cancelled").length +
       f.filter((r) => r.status === "cancelled").length;
     const aov = totalOrders > 0 ? Math.round(totalRevenue / Math.max(1, totalOrders - cancelled)) : 0;
+    const cancelRate = totalOrders > 0 ? Math.round((cancelled / totalOrders) * 100) : 0;
+
+    // Avg delivery time (mins) for delivered orders
+    const deliveredRows = [
+      ...p.filter((r) => r.status === "delivered"),
+      ...f.filter((r) => r.status === "delivered"),
+    ];
+    const avgDeliveryMin = deliveredRows.length
+      ? Math.round(
+          deliveredRows.reduce(
+            (s, r) => s + (new Date(r.updated_at).getTime() - new Date(r.created_at).getTime()) / 60000,
+            0,
+          ) / deliveredRows.length,
+        )
+      : 0;
+
+    // Avg rider rating overall
+    let sumR = 0, cntR = 0;
+    ratingMap.forEach((v) => { sumR += v.sum; cntR += v.count; });
+    const avgRating = cntR > 0 ? +(sumR / cntR).toFixed(1) : 0;
 
     return {
       revenueSeries,
       hourSeries: hourCounts,
       topItems,
       topRestaurants,
-      kpis: { totalRevenue, totalOrders, delivered, cancelled, aov },
+      topRiders,
+      kpis: { totalRevenue, totalOrders, delivered, cancelled, aov, cancelRate, avgDeliveryMin, avgRating },
     };
-  }, [parcels, foods, range]);
+  }, [parcels, foods, reviews, range]);
 
   const maxHour = Math.max(1, ...hourSeries.map((h) => h.orders));
 
@@ -190,7 +270,7 @@ function AnalyticsPage() {
 
       {loading ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />)}
+          {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />)}
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -198,6 +278,10 @@ function AnalyticsPage() {
           <Kpi Icon={TrendingUp} label="অর্ডার" value={kpis.totalOrders} />
           <Kpi Icon={Package} label="ডেলিভার্ড" value={kpis.delivered} />
           <Kpi Icon={UtensilsCrossed} label="গড় মূল্য" value={`৳${kpis.aov}`} />
+          <Kpi Icon={Timer} label="গড় ডেলিভারি" value={`${kpis.avgDeliveryMin}m`} />
+          <Kpi Icon={XCircle} label="ক্যান্সেল রেট" value={`${kpis.cancelRate}%`} />
+          <Kpi Icon={Star} label="গড় রেটিং" value={kpis.avgRating || "—"} />
+          <Kpi Icon={Bike} label="সক্রিয় রাইডার" value={topRiders.length} />
         </div>
       )}
 
@@ -337,6 +421,53 @@ function AnalyticsPage() {
                     <td className="p-3 font-semibold">{restaurants[r.id] ?? "—"}</td>
                     <td className="p-3 text-right">{r.orders}</td>
                     <td className="p-3 text-right font-bold text-primary">৳{r.revenue}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+        <div className="mb-3 flex items-center gap-2">
+          <Bike className="h-4 w-4 text-accent" />
+          <h2 className="font-bold">রাইডার লিডারবোর্ড</h2>
+        </div>
+        {loading ? (
+          <Skeleton className="h-40 w-full" />
+        ) : topRiders.length === 0 ? (
+          <p className="py-10 text-center text-sm text-muted-foreground">ডেটা নেই</p>
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-border">
+            <table className="w-full text-sm">
+              <thead className="bg-secondary/50 text-xs text-muted-foreground">
+                <tr>
+                  <th className="p-3 text-left font-semibold">#</th>
+                  <th className="p-3 text-left font-semibold">রাইডার</th>
+                  <th className="p-3 text-right font-semibold">ডেলিভারি</th>
+                  <th className="p-3 text-right font-semibold">রেটিং</th>
+                  <th className="p-3 text-right font-semibold">আয়</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {topRiders.map((r, i) => (
+                  <tr key={r.id}>
+                    <td className="p-3 font-bold text-muted-foreground">{i + 1}</td>
+                    <td className="p-3 font-semibold">{riderNames[r.id] ?? "—"}</td>
+                    <td className="p-3 text-right">{r.delivered}</td>
+                    <td className="p-3 text-right">
+                      {r.rating ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Star className="h-3 w-3 fill-accent text-accent" />
+                          {r.rating}
+                          <span className="text-[10px] text-muted-foreground">({r.reviews})</span>
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
+                    <td className="p-3 text-right font-bold text-primary">৳{r.earnings}</td>
                   </tr>
                 ))}
               </tbody>
