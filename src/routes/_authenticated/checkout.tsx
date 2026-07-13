@@ -15,7 +15,8 @@ import { MALE_HALLS, FEMALE_HALLS, OTHER_LOCATIONS, calculateDeliveryCharge } fr
 import { cart, useCart, cartTotal, cartCount } from "@/lib/cart";
 import { fireConfetti } from "@/lib/confetti";
 import { PromoAndCredits } from "@/components/PromoAndCredits";
-import { ArrowLeft, Loader2, Minus, Plus, PartyPopper, ShoppingBag, Trash2, Copy } from "lucide-react";
+import { SchedulePicker, formatSchedule, type Schedule } from "@/components/SchedulePicker";
+import { ArrowLeft, Clock, Loader2, Minus, Plus, PartyPopper, ShoppingBag, Trash2, Copy } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
   head: () => ({ meta: [{ title: "চেকআউট — পায়রা" }] }),
@@ -47,6 +48,7 @@ function CheckoutPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [orderCode, setOrderCode] = useState<string | null>(null);
+  const [schedule, setSchedule] = useState<Schedule>({ mode: "now", iso: null });
   const [discounts, setDiscounts] = useState<{ promoCode: string | null; promoDiscount: number; creditsUsed: number }>({
     promoCode: null,
     promoDiscount: 0,
@@ -88,6 +90,12 @@ function CheckoutPage() {
     if (!items.length || !restaurant_id) return;
     const r = schema.safeParse(form);
     if (!r.success) return toast.error(r.error.issues[0]!.message);
+    if (schedule.mode === "later") {
+      if (!schedule.iso) return toast.error("সময় বেছে নিন");
+      if (new Date(schedule.iso).getTime() < Date.now() + 25 * 60 * 1000) {
+        return toast.error("কমপক্ষে ৩০ মিনিট পরের সময় দিন");
+      }
+    }
 
     setSubmitting(true);
     const { data, error } = await supabase
@@ -105,6 +113,7 @@ function CheckoutPage() {
         receiver_block_room: form.receiver_block_room,
         receiver_landmark: form.receiver_landmark || null,
         note: form.note || null,
+        scheduled_for: schedule.mode === "later" ? schedule.iso : null,
       })
       .select("id, order_code")
       .single();
@@ -313,6 +322,16 @@ function CheckoutPage() {
               />
             </div>
           </div>
+        </div>
+
+        <div className="rounded-3xl border border-border bg-card p-5 shadow-card">
+          <SchedulePicker value={schedule} onChange={setSchedule} />
+          {schedule.mode === "later" && schedule.iso && (
+            <div className="mt-3 flex items-center gap-2 rounded-xl bg-accent/10 p-3 text-sm text-accent">
+              <Clock className="h-4 w-4" />
+              <span className="font-bangla">{formatSchedule(schedule.iso)} এ ডেলিভারি হবে</span>
+            </div>
+          )}
         </div>
 
         <PromoAndCredits subtotal={subtotal} orderType="food" onChange={onDiscountsChange} />

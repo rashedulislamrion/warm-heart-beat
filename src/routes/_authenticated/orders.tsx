@@ -21,13 +21,13 @@ export const Route = createFileRoute("/_authenticated/orders")({
 
 type Parcel = {
   id: string; order_code: string; status: string; delivery_charge: number;
-  sender_hall: string; receiver_hall: string; created_at: string; rider_id: string | null;
+  sender_hall: string; receiver_hall: string; created_at: string; rider_id: string | null; scheduled_for: string | null;
 };
 type OrderItem = { id: string; name: string; price: number; qty: number };
 type FoodOrder = {
   id: string; order_code: string; status: string; total: number;
   receiver_hall: string; restaurant_id: string | null; created_at: string;
-  items: OrderItem[]; rider_id: string | null;
+  items: OrderItem[]; rider_id: string | null; scheduled_for: string | null;
 };
 
 type ReviewRow = { order_id: string; rating: number };
@@ -70,12 +70,12 @@ function OrdersPage() {
 
   useEffect(() => {
     supabase.from("parcels")
-      .select("id, order_code, status, delivery_charge, sender_hall, receiver_hall, created_at, rider_id")
+      .select("id, order_code, status, delivery_charge, sender_hall, receiver_hall, created_at, rider_id, scheduled_for")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .then(({ data }) => setParcels((data as Parcel[]) ?? []));
     supabase.from("food_orders")
-      .select("id, order_code, status, total, receiver_hall, restaurant_id, created_at, items, rider_id")
+      .select("id, order_code, status, total, receiver_hall, restaurant_id, created_at, items, rider_id, scheduled_for")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .then(({ data }) => setFoods(((data ?? []) as unknown) as FoodOrder[]));
@@ -209,6 +209,7 @@ function OrdersPage() {
                     statusLabel={s.label}
                     statusClass={s.className}
                     amount={r.delivery_charge}
+                    scheduledFor={r.scheduled_for}
                     footer={
                       (canChat || canRate || rated) ? (
                         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -271,6 +272,7 @@ function OrdersPage() {
                   statusLabel={s.label}
                   statusClass={s.className}
                   amount={r.total}
+                  scheduledFor={r.scheduled_for}
                   accent
                   footer={
                     <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -361,12 +363,14 @@ function OrdersPage() {
 }
 
 function Card({
-  icon, title, subtitle, date, statusLabel, statusClass, amount, accent, footer,
+  icon, title, subtitle, date, statusLabel, statusClass, amount, accent, footer, scheduledFor,
 }: {
   icon: React.ReactNode; title: string; subtitle: string; date: string;
   statusLabel: string; statusClass: string; amount: number; accent?: boolean;
-  footer?: React.ReactNode;
+  footer?: React.ReactNode; scheduledFor?: string | null;
 }) {
+  const scheduled = scheduledFor ? new Date(scheduledFor) : null;
+  const isFuture = scheduled ? scheduled.getTime() > Date.now() : false;
   return (
     <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
       <div className="flex items-start justify-between gap-3">
@@ -380,6 +384,15 @@ function Card({
             <div className="mt-1 text-[11px] text-muted-foreground">
               {new Date(date).toLocaleString("bn-BD")}
             </div>
+            {scheduled && (
+              <div className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${isFuture ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"}`}>
+                <span>🕒</span>
+                <span className="font-bangla">
+                  {isFuture ? "নির্ধারিত: " : "নির্ধারিত ছিল: "}
+                  {scheduled.toLocaleString("bn-BD", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true })}
+                </span>
+              </div>
+            )}
           </div>
         </div>
         <div className="text-right">

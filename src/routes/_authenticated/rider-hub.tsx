@@ -23,12 +23,12 @@ type Parcel = {
   sender_name: string; sender_hall: string; sender_phone: string;
   receiver_name: string; receiver_hall: string; receiver_phone: string;
   item_type: string | null; size: string | null;
-  created_at: string; rider_id: string | null;
+  created_at: string; rider_id: string | null; scheduled_for: string | null;
 };
 type FoodOrder = {
   id: string; order_code: string; status: string; total: number; delivery_charge: number;
   receiver_name: string; receiver_hall: string; receiver_phone: string;
-  restaurant_id: string; items: any; created_at: string; rider_id: string | null;
+  restaurant_id: string; items: any; created_at: string; rider_id: string | null; scheduled_for: string | null;
 };
 
 type Tab = "available" | "active" | "done";
@@ -69,14 +69,14 @@ function RiderHub() {
   useEffect(() => {
     if (state !== "ok") return;
     supabase.from("parcels")
-      .select("id, order_code, status, delivery_charge, sender_name, sender_hall, sender_phone, receiver_name, receiver_hall, receiver_phone, item_type, size, created_at, rider_id")
+      .select("id, order_code, status, delivery_charge, sender_name, sender_hall, sender_phone, receiver_name, receiver_hall, receiver_phone, item_type, size, created_at, rider_id, scheduled_for")
       .or(`rider_id.eq.${user.id},and(rider_id.is.null,status.eq.pending)`)
       .order("created_at", { ascending: false })
       .limit(100)
       .then(({ data }) => setParcels((data as Parcel[]) ?? []));
 
     supabase.from("food_orders")
-      .select("id, order_code, status, total, delivery_charge, receiver_name, receiver_hall, receiver_phone, restaurant_id, items, created_at, rider_id")
+      .select("id, order_code, status, total, delivery_charge, receiver_name, receiver_hall, receiver_phone, restaurant_id, items, created_at, rider_id, scheduled_for")
       .or(`rider_id.eq.${user.id},and(rider_id.is.null,status.in.(confirmed,preparing))`)
       .order("created_at", { ascending: false })
       .limit(100)
@@ -90,7 +90,7 @@ function RiderHub() {
     const ch1 = supabase.channel("rider-parcels")
       .on("postgres_changes", { event: "*", schema: "public", table: "parcels" }, () => {
         supabase.from("parcels")
-          .select("id, order_code, status, delivery_charge, sender_name, sender_hall, sender_phone, receiver_name, receiver_hall, receiver_phone, item_type, size, created_at, rider_id")
+          .select("id, order_code, status, delivery_charge, sender_name, sender_hall, sender_phone, receiver_name, receiver_hall, receiver_phone, item_type, size, created_at, rider_id, scheduled_for")
           .or(`rider_id.eq.${user.id},and(rider_id.is.null,status.eq.pending)`)
           .order("created_at", { ascending: false })
           .limit(100)
@@ -100,7 +100,7 @@ function RiderHub() {
     const ch2 = supabase.channel("rider-food")
       .on("postgres_changes", { event: "*", schema: "public", table: "food_orders" }, () => {
         supabase.from("food_orders")
-          .select("id, order_code, status, total, delivery_charge, receiver_name, receiver_hall, receiver_phone, restaurant_id, items, created_at, rider_id")
+          .select("id, order_code, status, total, delivery_charge, receiver_name, receiver_hall, receiver_phone, restaurant_id, items, created_at, rider_id, scheduled_for")
           .or(`rider_id.eq.${user.id},and(rider_id.is.null,status.in.(confirmed,preparing))`)
           .order("created_at", { ascending: false })
           .limit(100)
@@ -123,8 +123,9 @@ function RiderHub() {
     return { activeCount, totalDeliveries, earnings };
   }, [foods, parcels, user.id]);
 
-  const availableParcels = (parcels ?? []).filter((p) => p.rider_id === null);
-  const availableFoods = (foods ?? []).filter((f) => f.rider_id === null);
+  const scheduleReady = (s: string | null) => !s || new Date(s).getTime() - Date.now() <= 30 * 60 * 1000;
+  const availableParcels = (parcels ?? []).filter((p) => p.rider_id === null && scheduleReady(p.scheduled_for));
+  const availableFoods = (foods ?? []).filter((f) => f.rider_id === null && scheduleReady(f.scheduled_for));
   const myActiveParcels = (parcels ?? []).filter((p) => p.rider_id === user.id && p.status !== "delivered" && p.status !== "cancelled");
   const myActiveFoods = (foods ?? []).filter((f) => f.rider_id === user.id && f.status !== "delivered" && f.status !== "cancelled");
   const myDoneParcels = (parcels ?? []).filter((p) => p.rider_id === user.id && (p.status === "delivered" || p.status === "cancelled"));

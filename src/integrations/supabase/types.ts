@@ -58,6 +58,7 @@ export type Database = {
           receiver_phone: string
           restaurant_id: string
           rider_id: string | null
+          scheduled_for: string | null
           status: Database["public"]["Enums"]["food_order_status"]
           subtotal: number
           total: number
@@ -78,6 +79,7 @@ export type Database = {
           receiver_phone: string
           restaurant_id: string
           rider_id?: string | null
+          scheduled_for?: string | null
           status?: Database["public"]["Enums"]["food_order_status"]
           subtotal: number
           total: number
@@ -98,6 +100,7 @@ export type Database = {
           receiver_phone?: string
           restaurant_id?: string
           rider_id?: string | null
+          scheduled_for?: string | null
           status?: Database["public"]["Enums"]["food_order_status"]
           subtotal?: number
           total?: number
@@ -207,6 +210,7 @@ export type Database = {
           receiver_name: string
           receiver_phone: string
           rider_id: string | null
+          scheduled_for: string | null
           sender_block_room: string | null
           sender_hall: string
           sender_landmark: string | null
@@ -232,6 +236,7 @@ export type Database = {
           receiver_name: string
           receiver_phone: string
           rider_id?: string | null
+          scheduled_for?: string | null
           sender_block_room?: string | null
           sender_hall: string
           sender_landmark?: string | null
@@ -257,6 +262,7 @@ export type Database = {
           receiver_name?: string
           receiver_phone?: string
           rider_id?: string | null
+          scheduled_for?: string | null
           sender_block_room?: string | null
           sender_hall?: string
           sender_landmark?: string | null

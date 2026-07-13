@@ -18,6 +18,7 @@ import {
   calculateDeliveryCharge,
 } from "@/lib/halls";
 import { fireConfetti } from "@/lib/confetti";
+import { SchedulePicker, formatSchedule, type Schedule } from "@/components/SchedulePicker";
 import {
   ArrowLeft, ArrowRight, Check, Package, User, MapPin, Boxes, Wallet,
   FileText, Pill, ShoppingBag, Shirt, Cpu, Loader2, PartyPopper, Share2, Copy,
@@ -81,6 +82,7 @@ function ParcelFlow() {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>(1);
   const [data, setData] = useState<ParcelState>(empty);
+  const [schedule, setSchedule] = useState<Schedule>({ mode: "now", iso: null });
   const [submitting, setSubmitting] = useState(false);
   const [orderCode, setOrderCode] = useState<string | null>(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
@@ -126,6 +128,12 @@ function ParcelFlow() {
   }
 
   async function submit() {
+    if (schedule.mode === "later") {
+      if (!schedule.iso) return toast.error("সময় বেছে নিন");
+      if (new Date(schedule.iso).getTime() < Date.now() + 25 * 60 * 1000) {
+        return toast.error("কমপক্ষে ৩০ মিনিট পরের সময় দিন");
+      }
+    }
     setSubmitting(true);
     const { data: inserted, error } = await supabase
       .from("parcels")
@@ -146,6 +154,7 @@ function ParcelFlow() {
         description: data.description || null,
         note: data.note || null,
         delivery_charge: charge,
+        scheduled_for: schedule.mode === "later" ? schedule.iso : null,
       })
       .select("order_code")
       .single();
@@ -182,8 +191,8 @@ function ParcelFlow() {
         <div className="rounded-3xl border border-border/60 bg-card/90 p-5 shadow-card backdrop-blur-lg md:p-8">
           {step === 1 && <SenderStep data={data} set={set} />}
           {step === 2 && <ReceiverStep data={data} set={set} />}
-          {step === 3 && <DetailsStep data={data} set={set} />}
-          {step === 4 && <ReviewStep data={data} charge={charge} />}
+          {step === 3 && <DetailsStep data={data} set={set} schedule={schedule} setSchedule={setSchedule} />}
+          {step === 4 && <ReviewStep data={data} charge={charge} schedule={schedule} />}
 
           <div className="mt-8 flex gap-3">
             {step > 1 && (
@@ -306,7 +315,7 @@ function ReceiverStep({ data, set }: { data: ParcelState; set: SetFn }) {
   );
 }
 
-function DetailsStep({ data, set }: { data: ParcelState; set: SetFn }) {
+function DetailsStep({ data, set, schedule, setSchedule }: { data: ParcelState; set: SetFn; schedule: Schedule; setSchedule: (v: Schedule) => void }) {
   return (
     <div className="space-y-6">
       <div>
@@ -365,11 +374,14 @@ function DetailsStep({ data, set }: { data: ParcelState; set: SetFn }) {
           maxLength={500}
         />
       </Field>
+
+      <SchedulePicker value={schedule} onChange={setSchedule} />
     </div>
   );
 }
 
-function ReviewStep({ data, charge }: { data: ParcelState; charge: number }) {
+function ReviewStep({ data, charge, schedule }: { data: ParcelState; charge: number; schedule: Schedule }) {
+  const when = formatSchedule(schedule.iso);
   return (
     <div className="space-y-4">
       <div>
@@ -385,6 +397,7 @@ function ReviewStep({ data, charge }: { data: ParcelState; charge: number }) {
         <Row label="যাবে" value={`${data.receiver_hall}, ${data.receiver_block_room}`} />
         <div className="my-3 border-t border-dashed" />
         <Row label="পার্সেল" value={`${itemTypes.find((i) => i.v === data.item_type)?.label} • ${sizes.find((s) => s.v === data.size)?.label}`} />
+        <Row label="সময়" value={schedule.mode === "later" && when ? when : "এখনই"} />
       </div>
 
       <div className="rounded-2xl gradient-primary p-5 text-primary-foreground shadow-soft">
