@@ -15,7 +15,8 @@ import { MALE_HALLS, FEMALE_HALLS, OTHER_LOCATIONS, calculateDeliveryCharge } fr
 import { cart, useCart, cartTotal, cartCount } from "@/lib/cart";
 import { fireConfetti } from "@/lib/confetti";
 import { PromoAndCredits } from "@/components/PromoAndCredits";
-import { ArrowLeft, Loader2, Minus, Plus, PartyPopper, ShoppingBag, Trash2, Copy } from "lucide-react";
+import { SchedulePicker, formatSchedule, type Schedule } from "@/components/SchedulePicker";
+import { ArrowLeft, Clock, Loader2, Minus, Plus, PartyPopper, ShoppingBag, Trash2, Copy } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
   head: () => ({ meta: [{ title: "চেকআউট — পায়রা" }] }),
