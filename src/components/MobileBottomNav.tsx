@@ -1,13 +1,18 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, UtensilsCrossed, Package, ScrollText, User } from "lucide-react";
 
-const items = [
+const items: {
+  to: "/" | "/food" | "/parcel" | "/orders" | "/profile";
+  label: string;
+  icon: typeof Home;
+  highlight?: boolean;
+}[] = [
   { to: "/", label: "হোম", icon: Home },
   { to: "/food", label: "খাবার", icon: UtensilsCrossed },
   { to: "/parcel", label: "পার্সেল", icon: Package, highlight: true },
   { to: "/orders", label: "অর্ডার", icon: ScrollText },
   { to: "/profile", label: "প্রোফাইল", icon: User },
-] as const;
+];
 
 export function MobileBottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });

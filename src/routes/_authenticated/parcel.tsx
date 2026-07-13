@@ -121,7 +121,7 @@ function ParcelFlow() {
       const r = step2Schema.safeParse(data);
       if (!r.success) return toast.error(r.error.issues[0]!.message);
     }
-    setStep((s) => Math.min(4, (s + 1) as Step));
+    setStep((s) => (s < 4 ? ((s + 1) as Step) : s));
   }
 
   async function submit() {
