@@ -53,6 +53,7 @@ type MenuItem = {
 function RestaurantPage() {
   const r = Route.useLoaderData();
   const [menu, setMenu] = useState<MenuItem[] | null>(null);
+  const [reviews, setReviews] = useState<Review[] | null>(null);
   const items = useCart();
   const count = cartCount(items);
   const total = cartTotal(items);
@@ -64,6 +65,14 @@ function RestaurantPage() {
       .eq("restaurant_id", r.id)
       .order("category", { ascending: true })
       .then(({ data }) => setMenu((data as MenuItem[]) ?? []));
+    supabase
+      .from("reviews" as any)
+      .select("id, rating, comment, created_at")
+      .eq("restaurant_id", r.id)
+      .not("comment", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(20)
+      .then(({ data }) => setReviews(((data ?? []) as unknown) as Review[]));
   }, [r.id]);
 
   const categories = useMemo(() => {
