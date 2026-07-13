@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FoodRestaurantIdRouteImport } from './routes/food.$restaurantId'
+import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedRiderHubRouteImport } from './routes/_authenticated/rider-hub'
 import { Route as AuthenticatedProfileSetupRouteImport } from './routes/_authenticated/profile-setup'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -63,6 +64,11 @@ const FoodRestaurantIdRoute = FoodRestaurantIdRouteImport.update({
   id: '/$restaurantId',
   path: '/$restaurantId',
   getParentRoute: () => FoodRoute,
+} as any)
+const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedRiderHubRoute = AuthenticatedRiderHubRouteImport.update({
   id: '/rider-hub',
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/profile-setup': typeof AuthenticatedProfileSetupRoute
   '/rider-hub': typeof AuthenticatedRiderHubRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/profile-setup': typeof AuthenticatedProfileSetupRoute
   '/rider-hub': typeof AuthenticatedRiderHubRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
@@ -191,6 +199,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/profile-setup': typeof AuthenticatedProfileSetupRoute
   '/_authenticated/rider-hub': typeof AuthenticatedRiderHubRoute
+  '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/food/$restaurantId': typeof FoodRestaurantIdRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/profile-setup'
     | '/rider-hub'
+    | '/wallet'
     | '/food/$restaurantId'
     | '/admin/analytics'
     | '/admin/restaurants'
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/profile-setup'
     | '/rider-hub'
+    | '/wallet'
     | '/food/$restaurantId'
     | '/admin/analytics'
     | '/admin/restaurants'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/profile-setup'
     | '/_authenticated/rider-hub'
+    | '/_authenticated/wallet'
     | '/food/$restaurantId'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/restaurants'
@@ -324,6 +336,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/food/$restaurantId'
       preLoaderRoute: typeof FoodRestaurantIdRouteImport
       parentRoute: typeof FoodRoute
+    }
+    '/_authenticated/wallet': {
+      id: '/_authenticated/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof AuthenticatedWalletRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rider-hub': {
       id: '/_authenticated/rider-hub'
@@ -448,6 +467,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProfileSetupRoute: typeof AuthenticatedProfileSetupRoute
   AuthenticatedRiderHubRoute: typeof AuthenticatedRiderHubRoute
+  AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -459,6 +479,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProfileSetupRoute: AuthenticatedProfileSetupRoute,
   AuthenticatedRiderHubRoute: AuthenticatedRiderHubRoute,
+  AuthenticatedWalletRoute: AuthenticatedWalletRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

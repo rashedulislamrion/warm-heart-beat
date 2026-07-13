@@ -51,8 +51,8 @@ function WalletPage() {
       supabase.from("payout_requests" as any).select("*").order("created_at", { ascending: false }).limit(20),
     ]);
     setBalance(typeof bal === "number" ? bal : 0);
-    setTxns((tx as Txn[]) ?? []);
-    setPayouts((po as Payout[]) ?? []);
+    setTxns(((tx as unknown) as Txn[]) ?? []);
+    setPayouts(((po as unknown) as Payout[]) ?? []);
   }
 
   useEffect(() => {
