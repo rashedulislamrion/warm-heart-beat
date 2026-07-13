@@ -58,7 +58,12 @@ function OrdersPage() {
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
   const [ratings, setRatings] = useState<Record<string, number>>({});
-  const [reviewFor, setReviewFor] = useState<FoodOrder | null>(null);
+  const [reviewFor, setReviewFor] = useState<
+    | { type: "food"; order: FoodOrder }
+    | { type: "parcel"; order: Parcel }
+    | null
+  >(null);
+  const [autoPrompted, setAutoPrompted] = useState(false);
   const [q, setQ] = useState("");
   const [reordering, setReordering] = useState<string | null>(null);
   const [chat, setChat] = useState<ChatTarget | null>(null);
@@ -83,6 +88,24 @@ function OrdersPage() {
         setRatings(map);
       });
   }, [user.id]);
+
+  // Auto-prompt review on most recent delivered, unrated order
+  useEffect(() => {
+    if (autoPrompted || reviewFor || parcels === null || foods === null) return;
+    const latestFood = foods.find((f) => f.status === "delivered" && !ratings[f.id]);
+    const latestParcel = parcels.find((p) => p.status === "delivered" && !!p.rider_id && !ratings[p.id]);
+    const foodTs = latestFood ? new Date(latestFood.created_at).getTime() : 0;
+    const parcelTs = latestParcel ? new Date(latestParcel.created_at).getTime() : 0;
+    if (foodTs === 0 && parcelTs === 0) return;
+    setAutoPrompted(true);
+    if (foodTs >= parcelTs && latestFood) {
+      setTab("food");
+      setReviewFor({ type: "food", order: latestFood });
+    } else if (latestParcel) {
+      setTab("parcel");
+      setReviewFor({ type: "parcel", order: latestParcel });
+    }
+  }, [parcels, foods, ratings, autoPrompted, reviewFor]);
 
   async function reorder(order: FoodOrder) {
     if (!order.restaurant_id) return;
@@ -174,6 +197,8 @@ function OrdersPage() {
               return filtered.map((r) => {
                 const s = parcelStatus[r.status] ?? parcelStatus.pending!;
                 const canChat = r.status !== "cancelled" && r.status !== "delivered";
+                const rated = ratings[r.id];
+                const canRate = r.status === "delivered" && !!r.rider_id && !rated;
                 return (
                   <Card
                     key={r.id}
@@ -185,15 +210,32 @@ function OrdersPage() {
                     statusClass={s.className}
                     amount={r.delivery_charge}
                     footer={
-                      canChat ? (
+                      (canChat || canRate || rated) ? (
                         <div className="mt-3 flex flex-wrap items-center gap-2">
-                          <button
-                            onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
-                          >
-                            <MessageCircle className="h-3.5 w-3.5" />
-                            <span className="font-bangla">রাইডার চ্যাট</span>
-                          </button>
+                          {canRate && (
+                            <button
+                              onClick={() => setReviewFor({ type: "parcel", order: r })}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
+                            >
+                              <Star className="h-3.5 w-3.5" />
+                              <span className="font-bangla">রাইডার রেট করুন</span>
+                            </button>
+                          )}
+                          {rated ? (
+                            <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                              <StarDisplay value={rated} size={13} />
+                              <span className="font-bangla">আপনার রেটিং</span>
+                            </div>
+                          ) : null}
+                          {canChat && (
+                            <button
+                              onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
+                            >
+                              <MessageCircle className="h-3.5 w-3.5" />
+                              <span className="font-bangla">রাইডার চ্যাট</span>
+                            </button>
+                          )}
                         </div>
                       ) : null
                     }
@@ -234,7 +276,7 @@ function OrdersPage() {
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       {canRate ? (
                         <button
-                          onClick={() => setReviewFor(r)}
+                          onClick={() => setReviewFor({ type: "food", order: r })}
                           className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
                         >
                           <Star className="h-3.5 w-3.5" />
@@ -278,11 +320,14 @@ function OrdersPage() {
         <ReviewDialog
           open={!!reviewFor}
           onOpenChange={(v) => { if (!v) setReviewFor(null); }}
-          orderId={reviewFor.id}
-          orderCode={reviewFor.order_code}
-          restaurantId={reviewFor.restaurant_id}
+          orderId={reviewFor.order.id}
+          orderCode={reviewFor.order.order_code}
+          orderType={reviewFor.type}
+          restaurantId={reviewFor.type === "food" ? reviewFor.order.restaurant_id : null}
+          riderId={reviewFor.order.rider_id}
           onSubmitted={({ rating }) => {
-            setRatings((m) => ({ ...m, [reviewFor.id]: rating }));
+            const id = reviewFor.order.id;
+            setRatings((m) => ({ ...m, [id]: rating }));
             setReviewFor(null);
           }}
         />

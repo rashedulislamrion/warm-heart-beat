@@ -478,6 +478,8 @@ export type Database = {
           order_type: string
           rating: number
           restaurant_id: string | null
+          rider_id: string | null
+          rider_rating: number | null
           updated_at: string
           user_id: string
         }
@@ -489,6 +491,8 @@ export type Database = {
           order_type: string
           rating: number
           restaurant_id?: string | null
+          rider_id?: string | null
+          rider_rating?: number | null
           updated_at?: string
           user_id: string
         }
@@ -500,6 +504,8 @@ export type Database = {
           order_type?: string
           rating?: number
           restaurant_id?: string | null
+          rider_id?: string | null
+          rider_rating?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -599,6 +605,14 @@ export type Database = {
           avg_rating: number
           restaurant_id: string
           review_count: number
+        }[]
+      }
+      rider_ratings: {
+        Args: never
+        Returns: {
+          avg_rating: number
+          review_count: number
+          rider_id: string
         }[]
       }
       track_order: {
