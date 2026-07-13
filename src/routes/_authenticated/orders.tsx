@@ -65,10 +65,10 @@ function OrdersPage() {
       .order("created_at", { ascending: false })
       .then(({ data }) => setParcels((data as Parcel[]) ?? []));
     supabase.from("food_orders")
-      .select("id, order_code, status, total, receiver_hall, restaurant_id, created_at")
+      .select("id, order_code, status, total, receiver_hall, restaurant_id, created_at, items")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .then(({ data }) => setFoods((data as FoodOrder[]) ?? []));
+      .then(({ data }) => setFoods(((data ?? []) as unknown) as FoodOrder[]));
     supabase.from("reviews" as any)
       .select("order_id, rating")
       .eq("user_id", user.id)
