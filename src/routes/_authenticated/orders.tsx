@@ -104,14 +104,32 @@ function OrdersPage() {
           ))}
         </div>
 
+        <div className="relative mt-4">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="অর্ডার কোড বা হল খুঁজুন..."
+            className="w-full rounded-full border border-border bg-card py-2 pl-9 pr-3 text-sm outline-none focus:border-primary"
+          />
+        </div>
+
         <div className="mt-4 space-y-3">
           {tab === "parcel" ? (
             parcels === null ? (
               [...Array(3)].map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)
             ) : parcels.length === 0 ? (
               <EmptyState label="কোনো পার্সেল অর্ডার নেই" to="/parcel" cta="প্রথম পার্সেল পাঠান" />
-            ) : (
-              parcels.map((r) => {
+            ) : (() => {
+              const ql = q.trim().toLowerCase();
+              const filtered = ql
+                ? parcels.filter((r) =>
+                    r.order_code.toLowerCase().includes(ql) ||
+                    r.sender_hall.toLowerCase().includes(ql) ||
+                    r.receiver_hall.toLowerCase().includes(ql))
+                : parcels;
+              if (filtered.length === 0) return <p className="py-10 text-center font-bangla text-sm text-muted-foreground">কিছু পাওয়া যায়নি</p>;
+              return filtered.map((r) => {
                 const s = parcelStatus[r.status] ?? parcelStatus.pending!;
                 return (
                   <Card
@@ -125,17 +143,25 @@ function OrdersPage() {
                     amount={r.delivery_charge}
                   />
                 );
-              })
-            )
+              });
+            })()
           ) : foods === null ? (
             [...Array(3)].map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)
           ) : foods.length === 0 ? (
             <EmptyState label="কোনো খাবার অর্ডার নেই" to="/food" cta="খাবার অর্ডার করুন" />
-          ) : (
-            foods.map((r) => {
+          ) : (() => {
+            const ql = q.trim().toLowerCase();
+            const filtered = ql
+              ? foods.filter((r) =>
+                  r.order_code.toLowerCase().includes(ql) ||
+                  r.receiver_hall.toLowerCase().includes(ql))
+              : foods;
+            if (filtered.length === 0) return <p className="py-10 text-center font-bangla text-sm text-muted-foreground">কিছু পাওয়া যায়নি</p>;
+            return filtered.map((r) => {
               const s = foodStatus[r.status] ?? foodStatus.pending!;
               const rated = ratings[r.id];
               const canRate = r.status === "delivered" && !rated;
+              const canReorder = r.restaurant_id && Array.isArray(r.items) && r.items.length > 0;
               return (
                 <Card
                   key={r.id}
@@ -148,25 +174,37 @@ function OrdersPage() {
                   amount={r.total}
                   accent
                   footer={
-                    canRate ? (
-                      <button
-                        onClick={() => setReviewFor(r)}
-                        className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
-                      >
-                        <Star className="h-3.5 w-3.5" />
-                        <span className="font-bangla">রিভিউ দিন</span>
-                      </button>
-                    ) : rated ? (
-                      <div className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground">
-                        <StarDisplay value={rated} size={13} />
-                        <span className="font-bangla">আপনার রেটিং</span>
-                      </div>
-                    ) : null
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      {canRate ? (
+                        <button
+                          onClick={() => setReviewFor(r)}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
+                        >
+                          <Star className="h-3.5 w-3.5" />
+                          <span className="font-bangla">রিভিউ দিন</span>
+                        </button>
+                      ) : rated ? (
+                        <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                          <StarDisplay value={rated} size={13} />
+                          <span className="font-bangla">আপনার রেটিং</span>
+                        </div>
+                      ) : null}
+                      {canReorder && (
+                        <button
+                          onClick={() => reorder(r)}
+                          disabled={reordering === r.id}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10 disabled:opacity-60"
+                        >
+                          <RotateCw className={`h-3.5 w-3.5 ${reordering === r.id ? "animate-spin" : ""}`} />
+                          <span className="font-bangla">আবার অর্ডার</span>
+                        </button>
+                      )}
+                    </div>
                   }
                 />
               );
-            })
-          )}
+            });
+          })()}
         </div>
       </div>
 
