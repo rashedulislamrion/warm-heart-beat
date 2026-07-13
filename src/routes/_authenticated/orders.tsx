@@ -79,6 +79,40 @@ function OrdersPage() {
       });
   }, [user.id]);
 
+  async function reorder(order: FoodOrder) {
+    if (!order.restaurant_id) return;
+    setReordering(order.id);
+    try {
+      const ids = order.items.map((i) => i.id);
+      const [{ data: rest }, { data: menu }] = await Promise.all([
+        supabase.from("restaurants").select("id, name").eq("id", order.restaurant_id).maybeSingle(),
+        supabase.from("menu_items")
+          .select("id, name, price, image_url, is_available")
+          .in("id", ids),
+      ]);
+      if (!rest) { toast.error("রেস্টুরেন্ট পাওয়া যায়নি"); return; }
+      const available = (menu ?? []).filter((m) => m.is_available);
+      if (available.length === 0) { toast.error("আইটেম আর নেই"); return; }
+      cart.clear();
+      for (const it of order.items) {
+        const m = available.find((x) => x.id === it.id);
+        if (!m) continue;
+        for (let i = 0; i < it.qty; i++) {
+          cart.add(
+            { id: m.id, name: m.name, price: m.price, image_url: m.image_url, restaurant_id: rest.id, restaurant_name: rest.name },
+            rest.name,
+          );
+        }
+      }
+      const skipped = order.items.length - available.length;
+      if (skipped > 0) toast(`${skipped}টি আইটেম আর নেই`);
+      else toast.success("কার্টে যোগ হয়েছে");
+      navigate({ to: "/checkout" });
+    } finally {
+      setReordering(null);
+    }
+  }
+
   return (
     <div className="min-h-screen gradient-hero pb-24">
       <header className="mx-auto flex max-w-3xl items-center justify-between px-4 pt-6">
