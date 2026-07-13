@@ -17,6 +17,7 @@ import {
   OTHER_LOCATIONS,
   calculateDeliveryCharge,
 } from "@/lib/halls";
+import { fireConfetti } from "@/lib/confetti";
 import {
   ArrowLeft, ArrowRight, Check, Package, User, MapPin, Boxes, Wallet,
   FileText, Pill, ShoppingBag, Shirt, Cpu, Loader2, PartyPopper, Share2, Copy,
