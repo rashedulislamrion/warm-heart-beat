@@ -175,13 +175,21 @@ function AdminDashboard() {
 
   async function updateParcelStatus(id: string, status: string) {
     const { error } = await supabase.from("parcels").update({ status } as any).eq("id", id);
-    if (error) toast.error(error.message);
-    else toast.success("স্ট্যাটাস আপডেট হয়েছে");
+    if (error) return toast.error(error.message);
+    if (status === "cancelled") {
+      const { data } = await (supabase.rpc as any)("refund_order", { _order_type: "parcel", _order_id: id });
+      const credits = Array.isArray(data) ? Number(data[0]?.credits_refunded ?? 0) : 0;
+      toast.success(credits > 0 ? `বাতিল · ৳${credits} ক্রেডিট ফেরত` : "বাতিল হয়েছে");
+    } else toast.success("স্ট্যাটাস আপডেট হয়েছে");
   }
   async function updateFoodStatus(id: string, status: string) {
     const { error } = await supabase.from("food_orders").update({ status } as any).eq("id", id);
-    if (error) toast.error(error.message);
-    else toast.success("স্ট্যাটাস আপডেট হয়েছে");
+    if (error) return toast.error(error.message);
+    if (status === "cancelled") {
+      const { data } = await (supabase.rpc as any)("refund_order", { _order_type: "food", _order_id: id });
+      const credits = Array.isArray(data) ? Number(data[0]?.credits_refunded ?? 0) : 0;
+      toast.success(credits > 0 ? `বাতিল · ৳${credits} ক্রেডিট ফেরত` : "বাতিল হয়েছে");
+    } else toast.success("স্ট্যাটাস আপডেট হয়েছে");
   }
 
   const currentStatuses = tab === "parcel" ? parcelStatuses : foodStatuses;
