@@ -119,7 +119,7 @@ function AuthPage() {
       }
       if (result.redirected) return;
       toast.success("স্বাগতম!");
-      navigate({ to: redirectTo });
+      navigate({ to: await landingForCurrentUser() });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Google লগইন ব্যর্থ");
       setLoading(false);
