@@ -55,13 +55,25 @@ export const Route = createFileRoute("/api/public/hooks/order-push")({
           .select("id, endpoint, p256dh, auth")
           .eq("user_id", order.user_id);
         if (subsErr) return new Response(JSON.stringify({ error: subsErr.message }), { status: 500 });
-        if (!subs || subs.length === 0) return new Response(JSON.stringify({ ok: true, sent: 0 }));
 
         const label = STATUS_LABELS[order.status] || order.status;
         const title = type === "food" ? "খাবার অর্ডার আপডেট" : "পার্সেল আপডেট";
+        const bodyText = `${order.order_code}: ${label}`;
+
+        // Persist to inbox regardless of push subscriptions
+        await supabaseAdmin.from("notifications").insert({
+          user_id: order.user_id,
+          title,
+          body: bodyText,
+          url: "/orders",
+          type: type === "food" ? "food_order" : "parcel",
+        });
+
+        if (!subs || subs.length === 0) return new Response(JSON.stringify({ ok: true, sent: 0 }));
+
         const payload = JSON.stringify({
           title,
-          body: `${order.order_code}: ${label}`,
+          body: bodyText,
           tag: `order-${order.id}`,
           url: "/orders",
         });

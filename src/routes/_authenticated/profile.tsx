@@ -7,7 +7,7 @@ import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, LogOut, Pencil, User as UserIcon, Phone, MapPin, Shield, Gift, Bike, Wallet, Store } from "lucide-react";
+import { ArrowLeft, LogOut, Pencil, User as UserIcon, Phone, MapPin, Shield, Gift, Bike, Wallet, Store, Bell } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -20,6 +20,7 @@ function ProfilePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [profile, setProfile] = useState<any>(undefined);
+  const [unread, setUnread] = useState<number>(0);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isRider, setIsRider] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
@@ -33,6 +34,8 @@ function ProfilePage() {
       .then(({ data }) => setIsRider(Boolean(data)));
     supabase.rpc("has_role", { _user_id: user.id, _role: "restaurant" })
       .then(({ data }) => setIsOwner(Boolean(data)));
+    supabase.rpc("my_unread_notification_count")
+      .then(({ data }) => setUnread(Number(data ?? 0)));
   }, [user.id]);
 
   async function signOut() {
@@ -86,6 +89,21 @@ function ProfilePage() {
             >
               <Gift className="h-4 w-4" />
               <span className="font-bangla">বন্ধু আনুন, ৳৫০ পান</span>
+            </Link>
+
+            <Link
+              to="/notifications"
+              className="mt-3 inline-flex w-full items-center justify-between gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm font-semibold hover:bg-secondary"
+            >
+              <span className="flex items-center gap-2">
+                <Bell className="h-4 w-4" />
+                <span className="font-bangla">নোটিফিকেশন</span>
+              </span>
+              {unread > 0 && (
+                <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+                  {unread}
+                </span>
+              )}
             </Link>
 
             <Link

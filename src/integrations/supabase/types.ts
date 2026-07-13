@@ -164,6 +164,39 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          read_at: string | null
+          title: string
+          type: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          title: string
+          type?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       order_messages: {
         Row: {
           body: string
@@ -716,8 +749,10 @@ export type Database = {
         Args: { _order_id: string; _order_type: string; _user: string }
         Returns: boolean
       }
+      mark_all_notifications_read: { Args: never; Returns: number }
       my_credit_balance: { Args: never; Returns: number }
       my_restaurant_id: { Args: never; Returns: string }
+      my_unread_notification_count: { Args: never; Returns: number }
       my_wallet_balance: { Args: never; Returns: number }
       pay_with_wallet: {
         Args: { _amount: number; _order_id: string; _order_type: string }

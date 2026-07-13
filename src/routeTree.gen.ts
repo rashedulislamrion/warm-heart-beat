@@ -23,6 +23,7 @@ import { Route as AuthenticatedProfileSetupRouteImport } from './routes/_authent
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedParcelRouteImport } from './routes/_authenticated/parcel'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated/invite'
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
@@ -104,6 +105,12 @@ const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedInviteRoute = AuthenticatedInviteRouteImport.update({
   id: '/invite',
   path: '/invite',
@@ -163,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/invite': typeof AuthenticatedInviteRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/parcel': typeof AuthenticatedParcelRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -186,6 +194,7 @@ export interface FileRoutesByTo {
   '/track': typeof TrackRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/invite': typeof AuthenticatedInviteRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/parcel': typeof AuthenticatedParcelRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -212,6 +221,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/_authenticated/invite': typeof AuthenticatedInviteRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/_authenticated/parcel': typeof AuthenticatedParcelRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/checkout'
     | '/invite'
+    | '/notifications'
     | '/orders'
     | '/parcel'
     | '/profile'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/checkout'
     | '/invite'
+    | '/notifications'
     | '/orders'
     | '/parcel'
     | '/profile'
@@ -286,6 +298,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/checkout'
     | '/_authenticated/invite'
+    | '/_authenticated/notifications'
     | '/_authenticated/orders'
     | '/_authenticated/parcel'
     | '/_authenticated/profile'
@@ -412,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/invite': {
       id: '/_authenticated/invite'
       path: '/invite'
@@ -504,6 +524,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedCheckoutRoute: typeof AuthenticatedCheckoutRoute
   AuthenticatedInviteRoute: typeof AuthenticatedInviteRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
   AuthenticatedParcelRoute: typeof AuthenticatedParcelRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -517,6 +538,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedCheckoutRoute: AuthenticatedCheckoutRoute,
   AuthenticatedInviteRoute: AuthenticatedInviteRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
   AuthenticatedParcelRoute: AuthenticatedParcelRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
