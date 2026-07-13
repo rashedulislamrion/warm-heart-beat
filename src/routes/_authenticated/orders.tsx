@@ -20,16 +20,17 @@ export const Route = createFileRoute("/_authenticated/orders")({
 
 type Parcel = {
   id: string; order_code: string; status: string; delivery_charge: number;
-  sender_hall: string; receiver_hall: string; created_at: string;
+  sender_hall: string; receiver_hall: string; created_at: string; rider_id: string | null;
 };
 type OrderItem = { id: string; name: string; price: number; qty: number };
 type FoodOrder = {
   id: string; order_code: string; status: string; total: number;
   receiver_hall: string; restaurant_id: string | null; created_at: string;
-  items: OrderItem[];
+  items: OrderItem[]; rider_id: string | null;
 };
 
 type ReviewRow = { order_id: string; rating: number };
+type ChatTarget = { type: "food" | "parcel"; id: string; code: string; hasRider: boolean };
 
 const parcelStatus: Record<string, { label: string; className: string }> = {
   pending: { label: "অপেক্ষমাণ", className: "bg-muted text-muted-foreground" },
