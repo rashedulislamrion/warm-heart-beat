@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { UtensilsCrossed, Package, ArrowRight, Sparkles, Clock, MapPin, Shield, Search, Bike } from "lucide-react";
+import { useEffect, useState } from "react";
+import { UtensilsCrossed, Package, ArrowRight, Sparkles, Clock, MapPin, Shield, Search, Bike, LayoutDashboard, User as UserIcon } from "lucide-react";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -13,6 +15,39 @@ export const Route = createFileRoute("/")({
   }),
   component: Home,
 });
+
+type AuthState = { loading: boolean; signedIn: boolean; dashboard: { to: string; label: string } };
+
+function useHeaderAuth(): AuthState {
+  const [state, setState] = useState<AuthState>({ loading: true, signedIn: false, dashboard: { to: "/profile", label: "প্রোফাইল" } });
+
+  useEffect(() => {
+    let cancelled = false;
+    async function resolve() {
+      const { data } = await supabase.auth.getUser();
+      const uid = data.user?.id;
+      if (!uid) {
+        if (!cancelled) setState({ loading: false, signedIn: false, dashboard: { to: "/profile", label: "প্রোফাইল" } });
+        return;
+      }
+      const [{ data: isAdmin }, { data: isRider }, { data: isOwner }] = await Promise.all([
+        supabase.rpc("has_role", { _user_id: uid, _role: "admin" }),
+        supabase.rpc("has_role", { _user_id: uid, _role: "rider" }),
+        supabase.rpc("has_role", { _user_id: uid, _role: "restaurant" }),
+      ]);
+      let dashboard = { to: "/profile", label: "প্রোফাইল" };
+      if (isAdmin) dashboard = { to: "/admin", label: "অ্যাডমিন" };
+      else if (isOwner) dashboard = { to: "/restaurant-hub", label: "রেস্টুরেন্ট" };
+      else if (isRider) dashboard = { to: "/rider-hub", label: "রাইডার" };
+      if (!cancelled) setState({ loading: false, signedIn: true, dashboard });
+    }
+    resolve();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => resolve());
+    return () => { cancelled = true; sub.subscription.unsubscribe(); };
+  }, []);
+
+  return state;
+}
 
 function Home() {
   return (
