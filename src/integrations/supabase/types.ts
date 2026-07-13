@@ -275,6 +275,62 @@ export type Database = {
         }
         Relationships: []
       }
+      payout_requests: {
+        Row: {
+          account_number: string
+          admin_note: string | null
+          amount: number
+          created_at: string
+          id: string
+          method: string
+          note: string | null
+          processed_at: string | null
+          processed_by: string | null
+          status: string
+          txn_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_number: string
+          admin_note?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          method: string
+          note?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          txn_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_number?: string
+          admin_note?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          method?: string
+          note?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          txn_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_requests_txn_id_fkey"
+            columns: ["txn_id"]
+            isOneToOne: false
+            referencedRelation: "wallet_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -573,11 +629,67 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          id: string
+          kind: string
+          method: string | null
+          note: string | null
+          order_id: string | null
+          order_type: string | null
+          reference: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          method?: string | null
+          note?: string | null
+          order_id?: string | null
+          order_type?: string | null
+          reference?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          method?: string | null
+          note?: string | null
+          order_id?: string | null
+          order_type?: string | null
+          reference?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      approve_payout: {
+        Args: { _admin_note: string; _req_id: string }
+        Returns: undefined
+      }
+      approve_topup: { Args: { _txn_id: string }; Returns: undefined }
       attach_referrer: { Args: { _code: string }; Returns: string }
       gen_referral_code: { Args: never; Returns: string }
       has_role: {
@@ -592,6 +704,11 @@ export type Database = {
         Returns: boolean
       }
       my_credit_balance: { Args: never; Returns: number }
+      my_wallet_balance: { Args: never; Returns: number }
+      pay_with_wallet: {
+        Args: { _amount: number; _order_id: string; _order_type: string }
+        Returns: number
+      }
       redeem_credits: {
         Args: { _amount: number; _order_id: string; _order_type: string }
         Returns: number
@@ -604,6 +721,22 @@ export type Database = {
           _subtotal: number
         }
         Returns: number
+      }
+      reject_payout: {
+        Args: { _admin_note: string; _req_id: string }
+        Returns: undefined
+      }
+      reject_topup: {
+        Args: { _note: string; _txn_id: string }
+        Returns: undefined
+      }
+      request_payout: {
+        Args: { _account_number: string; _amount: number; _method: string }
+        Returns: string
+      }
+      request_topup: {
+        Args: { _amount: number; _method: string; _reference: string }
+        Returns: string
       }
       restaurant_ratings: {
         Args: never
