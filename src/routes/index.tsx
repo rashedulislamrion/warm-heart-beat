@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { UtensilsCrossed, Package, ArrowRight, Sparkles, Clock, MapPin, Shield } from "lucide-react";
+import { UtensilsCrossed, Package, ArrowRight, Sparkles, Clock, MapPin, Shield, Search, Bike } from "lucide-react";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
