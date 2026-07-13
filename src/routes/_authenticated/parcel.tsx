@@ -128,6 +128,12 @@ function ParcelFlow() {
   }
 
   async function submit() {
+    if (schedule.mode === "later") {
+      if (!schedule.iso) return toast.error("সময় বেছে নিন");
+      if (new Date(schedule.iso).getTime() < Date.now() + 25 * 60 * 1000) {
+        return toast.error("কমপক্ষে ৩০ মিনিট পরের সময় দিন");
+      }
+    }
     setSubmitting(true);
     const { data: inserted, error } = await supabase
       .from("parcels")
@@ -148,6 +154,7 @@ function ParcelFlow() {
         description: data.description || null,
         note: data.note || null,
         delivery_charge: charge,
+        scheduled_for: schedule.mode === "later" ? schedule.iso : null,
       })
       .select("order_code")
       .single();
