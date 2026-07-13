@@ -491,6 +491,7 @@ export type Database = {
       }
       restaurants: {
         Row: {
+          close_time: string | null
           created_at: string
           cuisine: string | null
           delivery_time_min: number
@@ -500,10 +501,13 @@ export type Database = {
           is_open: boolean
           min_order: number
           name: string
+          open_time: string | null
+          owner_id: string | null
           rating: number
           updated_at: string
         }
         Insert: {
+          close_time?: string | null
           created_at?: string
           cuisine?: string | null
           delivery_time_min?: number
@@ -513,10 +517,13 @@ export type Database = {
           is_open?: boolean
           min_order?: number
           name: string
+          open_time?: string | null
+          owner_id?: string | null
           rating?: number
           updated_at?: string
         }
         Update: {
+          close_time?: string | null
           created_at?: string
           cuisine?: string | null
           delivery_time_min?: number
@@ -526,6 +533,8 @@ export type Database = {
           is_open?: boolean
           min_order?: number
           name?: string
+          open_time?: string | null
+          owner_id?: string | null
           rating?: number
           updated_at?: string
         }
@@ -690,6 +699,10 @@ export type Database = {
         Returns: undefined
       }
       approve_topup: { Args: { _txn_id: string }; Returns: undefined }
+      assign_restaurant_owner: {
+        Args: { _restaurant_id: string; _user_id: string }
+        Returns: undefined
+      }
       attach_referrer: { Args: { _code: string }; Returns: string }
       gen_referral_code: { Args: never; Returns: string }
       has_role: {
@@ -704,6 +717,7 @@ export type Database = {
         Returns: boolean
       }
       my_credit_balance: { Args: never; Returns: number }
+      my_restaurant_id: { Args: never; Returns: string }
       my_wallet_balance: { Args: never; Returns: number }
       pay_with_wallet: {
         Args: { _amount: number; _order_id: string; _order_type: string }
