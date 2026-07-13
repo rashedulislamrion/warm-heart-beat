@@ -237,11 +237,16 @@ function OrdersPage() {
                           ) : null}
                           {canChat && (
                             <button
-                              onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
-                              className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
+                              onClick={() => openChat({ type: "parcel", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
+                              className="relative inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
                             >
                               <MessageCircle className="h-3.5 w-3.5" />
                               <span className="font-bangla">রাইডার চ্যাট</span>
+                              {countFor("parcel", r.id) > 0 && (
+                                <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                                  {countFor("parcel", r.id)}
+                                </span>
+                              )}
                             </button>
                           )}
                         </div>
