@@ -88,7 +88,7 @@ function AuthPage() {
         if (error) throw error;
         await attachReferralIfAny();
         toast.success("অ্যাকাউন্ট তৈরি হয়েছে!");
-        navigate({ to: redirectTo });
+        navigate({ to: await landingForCurrentUser() });
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: parsed.data.email,
@@ -97,7 +97,7 @@ function AuthPage() {
         if (error) throw error;
         await attachReferralIfAny();
         toast.success("স্বাগতম!");
-        navigate({ to: redirectTo });
+        navigate({ to: await landingForCurrentUser() });
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "ভুল হয়েছে");
