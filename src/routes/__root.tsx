@@ -114,7 +114,6 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [queryClient, router]);
 
-  return (
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
