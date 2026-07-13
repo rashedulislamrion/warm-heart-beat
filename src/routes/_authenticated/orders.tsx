@@ -49,11 +49,14 @@ type Tab = "parcel" | "food";
 
 function OrdersPage() {
   const { user } = Route.useRouteContext();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("parcel");
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [reviewFor, setReviewFor] = useState<FoodOrder | null>(null);
+  const [q, setQ] = useState("");
+  const [reordering, setReordering] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("parcels")
