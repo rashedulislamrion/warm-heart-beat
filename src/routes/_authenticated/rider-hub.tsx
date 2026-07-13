@@ -123,8 +123,9 @@ function RiderHub() {
     return { activeCount, totalDeliveries, earnings };
   }, [foods, parcels, user.id]);
 
-  const availableParcels = (parcels ?? []).filter((p) => p.rider_id === null);
-  const availableFoods = (foods ?? []).filter((f) => f.rider_id === null);
+  const scheduleReady = (s: string | null) => !s || new Date(s).getTime() - Date.now() <= 30 * 60 * 1000;
+  const availableParcels = (parcels ?? []).filter((p) => p.rider_id === null && scheduleReady(p.scheduled_for));
+  const availableFoods = (foods ?? []).filter((f) => f.rider_id === null && scheduleReady(f.scheduled_for));
   const myActiveParcels = (parcels ?? []).filter((p) => p.rider_id === user.id && p.status !== "delivered" && p.status !== "cancelled");
   const myActiveFoods = (foods ?? []).filter((f) => f.rider_id === user.id && f.status !== "delivered" && f.status !== "cancelled");
   const myDoneParcels = (parcels ?? []).filter((p) => p.rider_id === user.id && (p.status === "delivered" || p.status === "cancelled"));
