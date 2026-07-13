@@ -41,20 +41,31 @@ const statusColor: Record<string, string> = {
 
 type Tab = "parcel" | "food";
 
+type Rider = { id: string; full_name: string | null; phone: string | null };
+
 function AdminDashboard() {
   const { user } = Route.useRouteContext();
   const [tab, setTab] = useState<Tab>("parcel");
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
+  const [riders, setRiders] = useState<Rider[]>([]);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
 
-  async function assignSelf(orderType: "food" | "parcel", id: string) {
+  async function assignRider(orderType: "food" | "parcel", id: string, riderId: string | null) {
     const table = orderType === "parcel" ? "parcels" : "food_orders";
-    const { error } = await supabase.from(table).update({ rider_id: user.id }).eq("id", id);
+    const patch: any = { rider_id: riderId };
+    if (orderType === "parcel" && riderId) patch.status = "rider_assigned";
+    const { error } = await supabase.from(table).update(patch).eq("id", id);
     if (error) return toast.error(error.message);
-    toast.success("আপনি রাইডার হিসেবে যুক্ত হয়েছেন");
+    toast.success(riderId ? "রাইডার অ্যাসাইন হয়েছে" : "রাইডার সরানো হয়েছে");
+  }
+
+  function riderLabel(riderId: string | null) {
+    if (!riderId) return "রাইডার নেই";
+    const r = riders.find((x) => x.id === riderId);
+    return r?.full_name || r?.phone || "রাইডার";
   }
 
   useEffect(() => {
