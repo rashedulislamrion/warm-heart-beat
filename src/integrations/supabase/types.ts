@@ -14,16 +14,170 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      parcels: {
+        Row: {
+          created_at: string
+          delivery_charge: number
+          description: string | null
+          id: string
+          item_type: Database["public"]["Enums"]["parcel_item_type"]
+          note: string | null
+          order_code: string
+          photo_url: string | null
+          receiver_block_room: string | null
+          receiver_hall: string
+          receiver_landmark: string | null
+          receiver_name: string
+          receiver_phone: string
+          rider_id: string | null
+          sender_block_room: string | null
+          sender_hall: string
+          sender_landmark: string | null
+          sender_name: string
+          sender_phone: string
+          size: Database["public"]["Enums"]["parcel_size"]
+          status: Database["public"]["Enums"]["parcel_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_charge: number
+          description?: string | null
+          id?: string
+          item_type: Database["public"]["Enums"]["parcel_item_type"]
+          note?: string | null
+          order_code?: string
+          photo_url?: string | null
+          receiver_block_room?: string | null
+          receiver_hall: string
+          receiver_landmark?: string | null
+          receiver_name: string
+          receiver_phone: string
+          rider_id?: string | null
+          sender_block_room?: string | null
+          sender_hall: string
+          sender_landmark?: string | null
+          sender_name: string
+          sender_phone: string
+          size: Database["public"]["Enums"]["parcel_size"]
+          status?: Database["public"]["Enums"]["parcel_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_charge?: number
+          description?: string | null
+          id?: string
+          item_type?: Database["public"]["Enums"]["parcel_item_type"]
+          note?: string | null
+          order_code?: string
+          photo_url?: string | null
+          receiver_block_room?: string | null
+          receiver_hall?: string
+          receiver_landmark?: string | null
+          receiver_name?: string
+          receiver_phone?: string
+          rider_id?: string | null
+          sender_block_room?: string | null
+          sender_hall?: string
+          sender_landmark?: string | null
+          sender_name?: string
+          sender_phone?: string
+          size?: Database["public"]["Enums"]["parcel_size"]
+          status?: Database["public"]["Enums"]["parcel_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          block_room: string | null
+          created_at: string
+          full_name: string | null
+          hall: string | null
+          id: string
+          phone: string | null
+          profile_complete: boolean
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          block_room?: string | null
+          created_at?: string
+          full_name?: string | null
+          hall?: string | null
+          id: string
+          phone?: string | null
+          profile_complete?: boolean
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          block_room?: string | null
+          created_at?: string
+          full_name?: string | null
+          hall?: string | null
+          id?: string
+          phone?: string | null
+          profile_complete?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "rider" | "user"
+      parcel_item_type:
+        | "document"
+        | "medicine"
+        | "grocery"
+        | "clothes"
+        | "electronics"
+        | "other"
+      parcel_size: "small" | "medium" | "large"
+      parcel_status:
+        | "pending"
+        | "rider_assigned"
+        | "picked_up"
+        | "delivered"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +304,24 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "rider", "user"],
+      parcel_item_type: [
+        "document",
+        "medicine",
+        "grocery",
+        "clothes",
+        "electronics",
+        "other",
+      ],
+      parcel_size: ["small", "medium", "large"],
+      parcel_status: [
+        "pending",
+        "rider_assigned",
+        "picked_up",
+        "delivered",
+        "cancelled",
+      ],
+    },
   },
 } as const
