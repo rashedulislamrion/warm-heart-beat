@@ -21,12 +21,15 @@ function ProfilePage() {
   const qc = useQueryClient();
   const [profile, setProfile] = useState<any>(undefined);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isRider, setIsRider] = useState(false);
 
   useEffect(() => {
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()
       .then(({ data }) => setProfile(data ?? null));
     supabase.rpc("has_role", { _user_id: user.id, _role: "admin" })
       .then(({ data }) => setIsAdmin(Boolean(data)));
+    supabase.rpc("has_role", { _user_id: user.id, _role: "rider" })
+      .then(({ data }) => setIsRider(Boolean(data)));
   }, [user.id]);
 
   async function signOut() {
