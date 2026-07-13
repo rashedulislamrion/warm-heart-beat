@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ArrowLeft, Star, Clock, Plus, Minus, ShoppingBag, MessageSquare } from "lucide-react";
 import { cart, useCart, cartCount, cartTotal, type CartItem } from "@/lib/cart";
-import { StarDisplay } from "@/components/Stars";
 import { useFavorites, useCurrentUserId } from "@/lib/favorites";
 import { FavoriteHeart } from "@/components/FavoriteHeart";
+import { ReviewList, type ReviewRow } from "@/components/ReviewList";
 
 export const Route = createFileRoute("/food/$restaurantId")({
   head: ({ loaderData }) => {
