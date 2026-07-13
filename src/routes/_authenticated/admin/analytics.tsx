@@ -428,6 +428,53 @@ function AnalyticsPage() {
           </div>
         )}
       </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+        <div className="mb-3 flex items-center gap-2">
+          <Bike className="h-4 w-4 text-accent" />
+          <h2 className="font-bold">রাইডার লিডারবোর্ড</h2>
+        </div>
+        {loading ? (
+          <Skeleton className="h-40 w-full" />
+        ) : topRiders.length === 0 ? (
+          <p className="py-10 text-center text-sm text-muted-foreground">ডেটা নেই</p>
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-border">
+            <table className="w-full text-sm">
+              <thead className="bg-secondary/50 text-xs text-muted-foreground">
+                <tr>
+                  <th className="p-3 text-left font-semibold">#</th>
+                  <th className="p-3 text-left font-semibold">রাইডার</th>
+                  <th className="p-3 text-right font-semibold">ডেলিভারি</th>
+                  <th className="p-3 text-right font-semibold">রেটিং</th>
+                  <th className="p-3 text-right font-semibold">আয়</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {topRiders.map((r, i) => (
+                  <tr key={r.id}>
+                    <td className="p-3 font-bold text-muted-foreground">{i + 1}</td>
+                    <td className="p-3 font-semibold">{riderNames[r.id] ?? "—"}</td>
+                    <td className="p-3 text-right">{r.delivered}</td>
+                    <td className="p-3 text-right">
+                      {r.rating ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Star className="h-3 w-3 fill-accent text-accent" />
+                          {r.rating}
+                          <span className="text-[10px] text-muted-foreground">({r.reviews})</span>
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
+                    <td className="p-3 text-right font-bold text-primary">৳{r.earnings}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
