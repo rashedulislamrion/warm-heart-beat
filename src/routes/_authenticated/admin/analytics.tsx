@@ -47,6 +47,8 @@ function AnalyticsPage() {
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
   const [restaurants, setRestaurants] = useState<Record<string, string>>({});
+  const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [riderNames, setRiderNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const days = Number(range);
@@ -57,12 +59,12 @@ function AnalyticsPage() {
 
     supabase
       .from("parcels")
-      .select("id, delivery_charge, status, created_at")
+      .select("id, delivery_charge, status, created_at, updated_at, rider_id")
       .gte("created_at", sinceIso)
       .then(({ data }) => setParcels((data as Parcel[]) ?? []));
     supabase
       .from("food_orders")
-      .select("id, total, status, created_at, restaurant_id, items")
+      .select("id, total, status, created_at, updated_at, restaurant_id, rider_id, items")
       .gte("created_at", sinceIso)
       .then(({ data }) => setFoods(((data ?? []) as unknown) as FoodOrder[]));
     supabase
@@ -73,11 +75,34 @@ function AnalyticsPage() {
         ((data as Restaurant[]) ?? []).forEach((r) => (map[r.id] = r.name));
         setRestaurants(map);
       });
+    supabase
+      .from("reviews")
+      .select("rider_id, rider_rating")
+      .gte("created_at", sinceIso)
+      .then(({ data }) => setReviews((data as Review[]) ?? []));
   }, [range]);
+
+  // Load rider profile names for whichever rider_ids show up
+  useEffect(() => {
+    const ids = new Set<string>();
+    (parcels ?? []).forEach((p) => p.rider_id && ids.add(p.rider_id));
+    (foods ?? []).forEach((f) => f.rider_id && ids.add(f.rider_id));
+    const missing = [...ids].filter((id) => !(id in riderNames));
+    if (missing.length === 0) return;
+    supabase
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", missing)
+      .then(({ data }) => {
+        const next = { ...riderNames };
+        ((data as Profile[]) ?? []).forEach((p) => (next[p.id] = p.full_name ?? "—"));
+        setRiderNames(next);
+      });
+  }, [parcels, foods]);
 
   const loading = parcels === null || foods === null;
 
-  const { revenueSeries, hourSeries, topItems, topRestaurants, kpis } = useMemo(() => {
+  const { revenueSeries, hourSeries, topItems, topRestaurants, topRiders, kpis } = useMemo(() => {
     const p = parcels ?? [];
     const f = foods ?? [];
     const days = Number(range);
