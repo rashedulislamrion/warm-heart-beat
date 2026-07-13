@@ -41,6 +41,9 @@ function RiderApply() {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [checking, setChecking] = useState(true);
+  const [existing, setExisting] = useState<{ status: string; admin_note: string | null } | null>(null);
   const [form, setForm] = useState({
     full_name: "",
     phone: "",
@@ -52,6 +55,28 @@ function RiderApply() {
     has_bike: false,
     motivation: "",
   });
+
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate({ to: "/auth", search: { redirect: "/rider" } as any });
+        return;
+      }
+      setUserId(user.id);
+      const { data: prof } = await supabase.from("profiles").select("full_name, phone").eq("id", user.id).maybeSingle();
+      if (prof) {
+        setForm((f) => ({ ...f, full_name: prof.full_name ?? "", phone: prof.phone ?? "" }));
+      }
+      const { data: app } = await supabase
+        .from("rider_applications" as any)
+        .select("status, admin_note")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (app) setExisting(app as any);
+      setChecking(false);
+    })();
+  }, [navigate]);
 
   function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
