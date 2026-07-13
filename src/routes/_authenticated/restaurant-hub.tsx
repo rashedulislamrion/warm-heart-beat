@@ -110,7 +110,7 @@ function RestaurantHub() {
           </div>
         </div>
         <div className="mx-auto flex max-w-5xl gap-1 px-4 pb-2">
-          {(["orders", "menu", "settings"] as const).map((t) => (
+          {(["orders", "menu", "reviews", "settings"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -118,7 +118,7 @@ function RestaurantHub() {
                 tab === t ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {t === "orders" ? "অর্ডার" : t === "menu" ? "মেনু" : "সেটিংস"}
+              {t === "orders" ? "অর্ডার" : t === "menu" ? "মেনু" : t === "reviews" ? "রিভিউ" : "সেটিংস"}
             </button>
           ))}
         </div>
@@ -127,6 +127,7 @@ function RestaurantHub() {
       <main className="mx-auto max-w-5xl px-4 py-6">
         {tab === "orders" && <OrdersTab restaurantId={restaurant.id} />}
         {tab === "menu" && <MenuTab restaurantId={restaurant.id} />}
+        {tab === "reviews" && <ReviewsTab restaurantId={restaurant.id} />}
         {tab === "settings" && <SettingsTab restaurant={restaurant} onSaved={(r) => setRestaurant(r)} />}
       </main>
     </div>
