@@ -120,6 +120,11 @@ function RestaurantsAdmin() {
                   <p className="text-xs text-muted-foreground">{selected.description}</p>
                 </div>
                 <div className="flex gap-1">
+                  <AssignOwnerDialog restaurant={selected} onSaved={load}>
+                    <Button size="sm" variant="outline" className="h-8 rounded-lg" title="Assign Owner">
+                      <UserPlus className="h-3.5 w-3.5" />
+                    </Button>
+                  </AssignOwnerDialog>
                   <RestaurantDialog restaurant={selected} onSaved={load}>
                     <Button size="sm" variant="outline" className="h-8 rounded-lg">
                       <Pencil className="h-3.5 w-3.5" />
