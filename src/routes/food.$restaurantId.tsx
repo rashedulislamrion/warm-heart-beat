@@ -73,11 +73,10 @@ function RestaurantPage() {
       .then(({ data }) => setMenu((data as MenuItem[]) ?? []));
     supabase
       .from("reviews" as any)
-      .select("id, rating, comment, created_at")
+      .select("id, rating, comment, created_at, photo_urls, owner_reply, owner_reply_at, rider_reply, rider_reply_at")
       .eq("restaurant_id", r.id)
-      .not("comment", "is", null)
       .order("created_at", { ascending: false })
-      .limit(20)
+      .limit(50)
       .then(({ data }) => setReviews(((data ?? []) as unknown) as Review[]));
   }, [r.id]);
 
