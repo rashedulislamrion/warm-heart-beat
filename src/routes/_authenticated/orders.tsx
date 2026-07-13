@@ -89,6 +89,24 @@ function OrdersPage() {
       });
   }, [user.id]);
 
+  // Auto-prompt review on most recent delivered, unrated order
+  useEffect(() => {
+    if (autoPrompted || reviewFor || parcels === null || foods === null) return;
+    const latestFood = foods.find((f) => f.status === "delivered" && !ratings[f.id]);
+    const latestParcel = parcels.find((p) => p.status === "delivered" && !!p.rider_id && !ratings[p.id]);
+    const foodTs = latestFood ? new Date(latestFood.created_at).getTime() : 0;
+    const parcelTs = latestParcel ? new Date(latestParcel.created_at).getTime() : 0;
+    if (foodTs === 0 && parcelTs === 0) return;
+    setAutoPrompted(true);
+    if (foodTs >= parcelTs && latestFood) {
+      setTab("food");
+      setReviewFor({ type: "food", order: latestFood });
+    } else if (latestParcel) {
+      setTab("parcel");
+      setReviewFor({ type: "parcel", order: latestParcel });
+    }
+  }, [parcels, foods, ratings, autoPrompted, reviewFor]);
+
   async function reorder(order: FoodOrder) {
     if (!order.restaurant_id) return;
     setReordering(order.id);
