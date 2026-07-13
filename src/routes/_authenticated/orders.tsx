@@ -58,7 +58,12 @@ function OrdersPage() {
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
   const [ratings, setRatings] = useState<Record<string, number>>({});
-  const [reviewFor, setReviewFor] = useState<FoodOrder | null>(null);
+  const [reviewFor, setReviewFor] = useState<
+    | { type: "food"; order: FoodOrder }
+    | { type: "parcel"; order: Parcel }
+    | null
+  >(null);
+  const [autoPrompted, setAutoPrompted] = useState(false);
   const [q, setQ] = useState("");
   const [reordering, setReordering] = useState<string | null>(null);
   const [chat, setChat] = useState<ChatTarget | null>(null);
