@@ -225,8 +225,23 @@ function AdminDashboard() {
                       {r.item_type} · {r.size} · {new Date(r.created_at).toLocaleString("bn-BD")}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <div className="text-sm font-bold text-primary">৳{r.delivery_charge}</div>
+                    <button
+                      onClick={() => setChat({ type: "parcel", id: r.id, code: r.order_code })}
+                      className="grid h-9 w-9 place-items-center rounded-lg border border-border hover:bg-muted"
+                      aria-label="চ্যাট"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => assignSelf("parcel", r.id)}
+                      disabled={r.rider_id === user.id}
+                      className="inline-flex h-9 items-center gap-1 rounded-lg border border-border px-2 text-xs disabled:opacity-60"
+                    >
+                      {r.rider_id === user.id ? <Check className="h-3.5 w-3.5" /> : <UserPlus className="h-3.5 w-3.5" />}
+                      <span className="font-bangla">{r.rider_id === user.id ? "নিয়োগ" : "নিন"}</span>
+                    </button>
                     <Select value={r.status} onValueChange={(v) => updateParcelStatus(r.id, v)}>
                       <SelectTrigger className="h-9 w-40 rounded-lg text-xs">
                         <SelectValue />
