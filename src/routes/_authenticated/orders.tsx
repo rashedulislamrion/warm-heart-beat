@@ -252,6 +252,15 @@ function OrdersPage() {
                           <span className="font-bangla">আবার অর্ডার</span>
                         </button>
                       )}
+                      {canChat && (
+                        <button
+                          onClick={() => setChat({ type: "food", id: r.id, code: r.order_code, hasRider: !!r.rider_id })}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
+                        >
+                          <MessageCircle className="h-3.5 w-3.5" />
+                          <span className="font-bangla">রাইডার চ্যাট</span>
+                        </button>
+                      )}
                     </div>
                   }
                 />
