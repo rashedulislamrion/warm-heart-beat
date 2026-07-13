@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { OrderChat } from "@/components/OrderChat";
 import { toast } from "sonner";
-import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search, MessageCircle, UserPlus, Check } from "lucide-react";
+import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search, MessageCircle, Bike, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
