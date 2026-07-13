@@ -136,6 +136,14 @@ function RestaurantPage() {
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
+        {uid && (
+          <FavoriteHeart
+            active={favIds.has(r.id)}
+            onClick={() => toggleFav(r.id)}
+            className="absolute right-4 top-4"
+            size={20}
+          />
+        )}
       </div>
 
       <div className="mx-auto -mt-8 max-w-3xl px-4">
