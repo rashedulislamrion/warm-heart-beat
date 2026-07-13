@@ -7,7 +7,7 @@ import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, LogOut, Pencil, User as UserIcon, Phone, MapPin, Shield, Gift, Bike } from "lucide-react";
+import { ArrowLeft, LogOut, Pencil, User as UserIcon, Phone, MapPin, Shield, Gift, Bike, Wallet } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/profile")({
