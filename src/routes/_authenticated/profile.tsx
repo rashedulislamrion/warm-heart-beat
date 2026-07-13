@@ -7,7 +7,7 @@ import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, LogOut, Pencil, User as UserIcon, Phone, MapPin, Shield, Gift, Bike, Wallet } from "lucide-react";
+import { ArrowLeft, LogOut, Pencil, User as UserIcon, Phone, MapPin, Shield, Gift, Bike, Wallet, Store } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -22,6 +22,7 @@ function ProfilePage() {
   const [profile, setProfile] = useState<any>(undefined);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isRider, setIsRider] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()
@@ -30,6 +31,8 @@ function ProfilePage() {
       .then(({ data }) => setIsAdmin(Boolean(data)));
     supabase.rpc("has_role", { _user_id: user.id, _role: "rider" })
       .then(({ data }) => setIsRider(Boolean(data)));
+    supabase.rpc("has_role", { _user_id: user.id, _role: "restaurant" })
+      .then(({ data }) => setIsOwner(Boolean(data)));
   }, [user.id]);
 
   async function signOut() {
@@ -100,6 +103,16 @@ function ProfilePage() {
               >
                 <Bike className="h-4 w-4" />
                 <span className="font-bangla">রাইডার ড্যাশবোর্ড</span>
+              </Link>
+            )}
+
+            {isOwner && (
+              <Link
+                to="/restaurant-hub"
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent/10 px-4 py-3 text-sm font-semibold text-accent hover:bg-accent/15"
+              >
+                <Store className="h-4 w-4" />
+                <span className="font-bangla">রেস্টুরেন্ট ড্যাশবোর্ড</span>
               </Link>
             )}
 
