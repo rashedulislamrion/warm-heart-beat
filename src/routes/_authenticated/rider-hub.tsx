@@ -451,7 +451,7 @@ function ActiveParcel({ p, busy, unread, onNext, onRelease, onChat }: { p: Parce
   );
 }
 
-function ActiveFood({ f, busy, unread, onNext, onChat }: { f: FoodOrder; busy: boolean; unread: number; onNext: (next: string) => void; onChat: () => void }) {
+function ActiveFood({ f, busy, unread, onNext, onRelease, onChat }: { f: FoodOrder; busy: boolean; unread: number; onNext: (next: string) => void; onRelease: () => void; onChat: () => void }) {
   const next = (f.status === "confirmed" || f.status === "preparing") ? { key: "picked_up", label: "পিকআপ করেছি" }
     : f.status === "picked_up" ? { key: "delivered", label: "ডেলিভার সম্পন্ন" }
     : null;
