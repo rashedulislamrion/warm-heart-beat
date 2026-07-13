@@ -27,6 +27,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminRidersRouteImport } from './routes/_authenticated/admin/riders'
 import { Route as AuthenticatedAdminRestaurantsRouteImport } from './routes/_authenticated/admin/restaurants'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
+import { Route as ApiPublicHooksOrderPushRouteImport } from './routes/api/public/hooks/order-push'
 
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
@@ -121,6 +122,11 @@ const AuthenticatedAdminAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const ApiPublicHooksOrderPushRoute = ApiPublicHooksOrderPushRouteImport.update({
+  id: '/api/public/hooks/order-push',
+  path: '/api/public/hooks/order-push',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/admin/riders': typeof AuthenticatedAdminRidersRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/hooks/order-push': typeof ApiPublicHooksOrderPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/admin/riders': typeof AuthenticatedAdminRidersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/hooks/order-push': typeof ApiPublicHooksOrderPushRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/restaurants': typeof AuthenticatedAdminRestaurantsRoute
   '/_authenticated/admin/riders': typeof AuthenticatedAdminRidersRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/hooks/order-push': typeof ApiPublicHooksOrderPushRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/admin/restaurants'
     | '/admin/riders'
     | '/admin/'
+    | '/api/public/hooks/order-push'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/admin/restaurants'
     | '/admin/riders'
     | '/admin'
+    | '/api/public/hooks/order-push'
   id:
     | '__root__'
     | '/'
@@ -238,6 +249,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/restaurants'
     | '/_authenticated/admin/riders'
     | '/_authenticated/admin/'
+    | '/api/public/hooks/order-push'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -247,6 +259,7 @@ export interface RootRouteChildren {
   FoodRoute: typeof FoodRouteWithChildren
   RiderRoute: typeof RiderRoute
   TrackRoute: typeof TrackRoute
+  ApiPublicHooksOrderPushRoute: typeof ApiPublicHooksOrderPushRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -377,6 +390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/api/public/hooks/order-push': {
+      id: '/api/public/hooks/order-push'
+      path: '/api/public/hooks/order-push'
+      fullPath: '/api/public/hooks/order-push'
+      preLoaderRoute: typeof ApiPublicHooksOrderPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -440,6 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   FoodRoute: FoodRouteWithChildren,
   RiderRoute: RiderRoute,
   TrackRoute: TrackRoute,
+  ApiPublicHooksOrderPushRoute: ApiPublicHooksOrderPushRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

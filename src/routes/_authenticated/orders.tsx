@@ -10,6 +10,7 @@ import { StarDisplay } from "@/components/Stars";
 import { ReviewDialog } from "@/components/ReviewDialog";
 import { OrderChat } from "@/components/OrderChat";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PushNotificationToggle } from "@/components/PushNotificationToggle";
 import { cart } from "@/lib/cart";
 import { toast } from "sonner";
 
@@ -126,7 +127,10 @@ function OrdersPage() {
       </header>
 
       <div className="mx-auto mt-6 max-w-3xl px-4">
-        <h1 className="font-bangla text-2xl font-extrabold">আমার অর্ডার</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-bangla text-2xl font-extrabold">আমার অর্ডার</h1>
+          <PushNotificationToggle />
+        </div>
 
         <div className="mt-4 inline-flex rounded-full bg-secondary p-1">
           {(["parcel", "food"] as Tab[]).map((t) => (
