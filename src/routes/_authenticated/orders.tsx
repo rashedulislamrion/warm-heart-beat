@@ -302,11 +302,14 @@ function OrdersPage() {
         <ReviewDialog
           open={!!reviewFor}
           onOpenChange={(v) => { if (!v) setReviewFor(null); }}
-          orderId={reviewFor.id}
-          orderCode={reviewFor.order_code}
-          restaurantId={reviewFor.restaurant_id}
+          orderId={reviewFor.order.id}
+          orderCode={reviewFor.order.order_code}
+          orderType={reviewFor.type}
+          restaurantId={reviewFor.type === "food" ? reviewFor.order.restaurant_id : null}
+          riderId={reviewFor.order.rider_id}
           onSubmitted={({ rating }) => {
-            setRatings((m) => ({ ...m, [reviewFor.id]: rating }));
+            const id = reviewFor.order.id;
+            setRatings((m) => ({ ...m, [id]: rating }));
             setReviewFor(null);
           }}
         />
