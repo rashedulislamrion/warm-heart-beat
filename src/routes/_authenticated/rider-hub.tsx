@@ -140,23 +140,51 @@ function RiderHub() {
 
   async function claimParcel(p: Parcel) {
     setBusy(p.id);
-    const { error } = await supabase.from("parcels")
+    const { data, error } = await supabase.from("parcels")
       .update({ rider_id: user.id, status: "rider_assigned" })
-      .eq("id", p.id).is("rider_id", null);
+      .eq("id", p.id).is("rider_id", null)
+      .select("id");
     setBusy(null);
     if (error) return toast.error(error.message);
+    if (!data || data.length === 0) {
+      toast.error("দুঃখিত, অন্য রাইডার আগেই নিয়েছেন");
+      return;
+    }
     toast.success("অর্ডার নেওয়া হয়েছে");
     setTab("active");
   }
   async function claimFood(f: FoodOrder) {
     setBusy(f.id);
-    const { error } = await supabase.from("food_orders")
+    const { data, error } = await supabase.from("food_orders")
       .update({ rider_id: user.id })
-      .eq("id", f.id).is("rider_id", null);
+      .eq("id", f.id).is("rider_id", null)
+      .select("id");
     setBusy(null);
     if (error) return toast.error(error.message);
+    if (!data || data.length === 0) {
+      toast.error("দুঃখিত, অন্য রাইডার আগেই নিয়েছেন");
+      return;
+    }
     toast.success("অর্ডার নেওয়া হয়েছে");
     setTab("active");
+  }
+  async function releaseParcel(p: Parcel) {
+    if (!window.confirm("অর্ডার ছেড়ে দিতে চান?")) return;
+    setBusy(p.id);
+    const { error } = await (supabase.rpc as any)("release_order", { _order_type: "parcel", _order_id: p.id });
+    setBusy(null);
+    if (error) return toast.error(error.message);
+    toast.success("অর্ডার ছেড়ে দেওয়া হয়েছে");
+    setTab("available");
+  }
+  async function releaseFood(f: FoodOrder) {
+    if (!window.confirm("অর্ডার ছেড়ে দিতে চান?")) return;
+    setBusy(f.id);
+    const { error } = await (supabase.rpc as any)("release_order", { _order_type: "food", _order_id: f.id });
+    setBusy(null);
+    if (error) return toast.error(error.message);
+    toast.success("অর্ডার ছেড়ে দেওয়া হয়েছে");
+    setTab("available");
   }
   async function updateParcelStatus(p: Parcel, next: string) {
     setBusy(p.id);
@@ -268,6 +296,7 @@ function RiderHub() {
                     <ActiveParcel key={p.id} p={p} busy={busy === p.id}
                       unread={countFor("parcel", p.id)}
                       onNext={(next) => updateParcelStatus(p, next)}
+                      onRelease={() => releaseParcel(p)}
                       onChat={() => openChat({ type: "parcel", id: p.id, code: p.order_code })}
                     />
                   ))}
@@ -275,6 +304,7 @@ function RiderHub() {
                     <ActiveFood key={f.id} f={f} busy={busy === f.id}
                       unread={countFor("food", f.id)}
                       onNext={(next) => updateFoodStatus(f, next)}
+                      onRelease={() => releaseFood(f)}
                       onChat={() => openChat({ type: "food", id: f.id, code: f.order_code })}
                     />
                   ))}
@@ -382,7 +412,7 @@ function FoodCard({ f, onClaim, busy }: { f: FoodOrder; onClaim: () => void; bus
   );
 }
 
-function ActiveParcel({ p, busy, unread, onNext, onChat }: { p: Parcel; busy: boolean; unread: number; onNext: (next: string) => void; onChat: () => void }) {
+function ActiveParcel({ p, busy, unread, onNext, onRelease, onChat }: { p: Parcel; busy: boolean; unread: number; onNext: (next: string) => void; onRelease: () => void; onChat: () => void }) {
   const next = p.status === "rider_assigned" ? { key: "picked_up", label: "পিকআপ করেছি" }
     : p.status === "picked_up" ? { key: "delivered", label: "ডেলিভার সম্পন্ন" }
     : null;
@@ -416,12 +446,17 @@ function ActiveParcel({ p, busy, unread, onNext, onChat }: { p: Parcel; busy: bo
             <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{unread}</span>
           )}
         </Button>
+        {p.status === "rider_assigned" && (
+          <Button onClick={onRelease} disabled={busy} size="sm" variant="ghost" className="rounded-full text-destructive">
+            <span className="font-bangla">ছেড়ে দিন</span>
+          </Button>
+        )}
       </div>
     </div>
   );
 }
 
-function ActiveFood({ f, busy, unread, onNext, onChat }: { f: FoodOrder; busy: boolean; unread: number; onNext: (next: string) => void; onChat: () => void }) {
+function ActiveFood({ f, busy, unread, onNext, onRelease, onChat }: { f: FoodOrder; busy: boolean; unread: number; onNext: (next: string) => void; onRelease: () => void; onChat: () => void }) {
   const next = (f.status === "confirmed" || f.status === "preparing") ? { key: "picked_up", label: "পিকআপ করেছি" }
     : f.status === "picked_up" ? { key: "delivered", label: "ডেলিভার সম্পন্ন" }
     : null;
@@ -463,6 +498,11 @@ function ActiveFood({ f, busy, unread, onNext, onChat }: { f: FoodOrder; busy: b
             <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">{unread}</span>
           )}
         </Button>
+        {(f.status === "confirmed" || f.status === "preparing") && (
+          <Button onClick={onRelease} disabled={busy} size="sm" variant="ghost" className="rounded-full text-destructive">
+            <span className="font-bangla">ছেড়ে দিন</span>
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/restaurant-hub")({
 type Restaurant = {
   id: string; name: string; description: string | null; image_url: string | null;
   cuisine: string | null; delivery_time_min: number; min_order: number; is_open: boolean;
-  open_time: string | null; close_time: string | null;
+  open_time: string | null; close_time: string | null; location: string;
 };
 type MenuItem = {
   id: string; restaurant_id: string; name: string; description: string | null;
@@ -169,7 +169,9 @@ function OrdersTab({ restaurantId }: { restaurantId: string }) {
     if (!window.confirm(`অর্ডার ${o.order_code} বাতিল করবেন?`)) return;
     const { error } = await supabase.from("food_orders").update({ status: "cancelled" as any }).eq("id", o.id);
     if (error) return toast.error(error.message);
-    toast.success("বাতিল হয়েছে");
+    const { data: refund } = await (supabase.rpc as any)("refund_order", { _order_type: "food", _order_id: o.id });
+    const credits = Array.isArray(refund) ? Number(refund[0]?.credits_refunded ?? 0) : 0;
+    toast.success(credits > 0 ? `বাতিল · ৳${credits} ক্রেডিট ফেরত` : "বাতিল হয়েছে");
     load();
   }
 
@@ -314,6 +316,7 @@ function SettingsTab({ restaurant, onSaved }: { restaurant: Restaurant; onSaved:
     min_order: restaurant.min_order,
     open_time: restaurant.open_time ?? "",
     close_time: restaurant.close_time ?? "",
+    location: restaurant.location ?? "Gate-1",
   });
   const [saving, setSaving] = useState(false);
 
@@ -328,6 +331,7 @@ function SettingsTab({ restaurant, onSaved }: { restaurant: Restaurant; onSaved:
       min_order: Number(form.min_order) || 0,
       open_time: form.open_time || null,
       close_time: form.close_time || null,
+      location: form.location || "Gate-1",
     };
     const { data, error } = await supabase.from("restaurants").update(payload).eq("id", restaurant.id).select().single();
     setSaving(false);
@@ -344,6 +348,9 @@ function SettingsTab({ restaurant, onSaved }: { restaurant: Restaurant; onSaved:
         <Field label="Cuisine"><Input value={form.cuisine} onChange={(e) => setForm({ ...form, cuisine: e.target.value })} /></Field>
         <Field label="ইমেজ URL"><Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} /></Field>
       </div>
+      <Field label="পিকআপ লোকেশন (ডেলিভারি চার্জ হিসাবের জন্য)">
+        <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="Gate-1" />
+      </Field>
       <div className="grid grid-cols-2 gap-3">
         <Field label="ডেলিভারি (মিনিট)"><Input type="number" value={form.delivery_time_min} onChange={(e) => setForm({ ...form, delivery_time_min: +e.target.value })} /></Field>
         <Field label="সর্বনিম্ন অর্ডার"><Input type="number" value={form.min_order} onChange={(e) => setForm({ ...form, min_order: +e.target.value })} /></Field>

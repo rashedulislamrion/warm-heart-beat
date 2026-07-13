@@ -532,6 +532,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_open: boolean
+          location: string
           min_order: number
           name: string
           open_time: string | null
@@ -548,6 +549,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_open?: boolean
+          location?: string
           min_order?: number
           name: string
           open_time?: string | null
@@ -564,6 +566,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_open?: boolean
+          location?: string
           min_order?: number
           name?: string
           open_time?: string | null
@@ -840,12 +843,23 @@ export type Database = {
         }
         Returns: number
       }
+      refund_order: {
+        Args: { _order_id: string; _order_type: string }
+        Returns: {
+          credits_refunded: number
+          promo_released: boolean
+        }[]
+      }
       reject_payout: {
         Args: { _admin_note: string; _req_id: string }
         Returns: undefined
       }
       reject_topup: {
         Args: { _note: string; _txn_id: string }
+        Returns: undefined
+      }
+      release_order: {
+        Args: { _order_id: string; _order_type: string }
         Returns: undefined
       }
       request_payout: {

@@ -31,8 +31,7 @@ const schema = z.object({
   receiver_block_room: z.string().trim().min(1, "ব্লক/রুম দিন"),
 });
 
-// Assume restaurant is near "Gate-1" origin for charge calc
-const RESTAURANT_ORIGIN = "Gate-1";
+const DEFAULT_ORIGIN = "Gate-1";
 
 function CheckoutPage() {
   const { user } = Route.useRouteContext();
@@ -47,6 +46,7 @@ function CheckoutPage() {
     note: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [restaurantOrigin, setRestaurantOrigin] = useState<string>(DEFAULT_ORIGIN);
   const [orderCode, setOrderCode] = useState<string | null>(null);
   const [schedule, setSchedule] = useState<Schedule>({ mode: "now", iso: null });
   const [discounts, setDiscounts] = useState<{ promoCode: string | null; promoDiscount: number; creditsUsed: number }>({
@@ -76,8 +76,8 @@ function CheckoutPage() {
 
   const subtotal = cartTotal(items);
   const deliveryCharge = useMemo(
-    () => (form.receiver_hall ? calculateDeliveryCharge(RESTAURANT_ORIGIN, form.receiver_hall, "small") : 30),
-    [form.receiver_hall],
+    () => (form.receiver_hall ? calculateDeliveryCharge(restaurantOrigin, form.receiver_hall, "small") : 30),
+    [form.receiver_hall, restaurantOrigin],
   );
   const totalBeforeDiscount = subtotal + deliveryCharge;
   const totalDiscount = discounts.promoDiscount + discounts.creditsUsed;
@@ -85,6 +85,15 @@ function CheckoutPage() {
 
   const restaurant_id = items[0]?.restaurant_id ?? null;
   const restaurant_name = items[0]?.restaurant_name ?? "";
+
+  useEffect(() => {
+    if (!restaurant_id) return;
+    supabase.from("restaurants").select("location").eq("id", restaurant_id).maybeSingle()
+      .then(({ data }) => {
+        const loc = (data as { location?: string } | null)?.location;
+        if (loc) setRestaurantOrigin(loc);
+      });
+  }, [restaurant_id]);
 
   async function submit() {
     if (!items.length || !restaurant_id) return;
@@ -98,6 +107,28 @@ function CheckoutPage() {
     }
 
     setSubmitting(true);
+
+    // Re-validate availability & pricing right before placing order
+    const ids = items.map((i) => i.id);
+    const { data: fresh, error: freshErr } = await supabase
+      .from("menu_items")
+      .select("id, name, price, is_available")
+      .in("id", ids);
+    if (freshErr) {
+      setSubmitting(false);
+      return toast.error(freshErr.message);
+    }
+    const byId = new Map((fresh ?? []).map((m: any) => [m.id, m]));
+    for (const it of items) {
+      const cur = byId.get(it.id);
+      if (!cur) { setSubmitting(false); return toast.error(`"${it.name}" আর নেই`); }
+      if (!cur.is_available) { setSubmitting(false); return toast.error(`"${it.name}" এখন অনুপলব্ধ`); }
+      if (Number(cur.price) !== it.price) {
+        setSubmitting(false);
+        return toast.error(`"${it.name}" এর দাম পরিবর্তন হয়েছে, কার্ট রিফ্রেশ করুন`);
+      }
+    }
+
     const { data, error } = await supabase
       .from("food_orders")
       .insert({
