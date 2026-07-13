@@ -13,10 +13,12 @@ import { Route as FoodRouteImport } from './routes/food'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FoodRestaurantIdRouteImport } from './routes/food.$restaurantId'
 import { Route as AuthenticatedProfileSetupRouteImport } from './routes/_authenticated/profile-setup'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedParcelRouteImport } from './routes/_authenticated/parcel'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
+import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 
 const FoodRoute = FoodRouteImport.update({
   id: '/food',
@@ -36,6 +38,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const FoodRestaurantIdRoute = FoodRestaurantIdRouteImport.update({
+  id: '/$restaurantId',
+  path: '/$restaurantId',
+  getParentRoute: () => FoodRoute,
 } as any)
 const AuthenticatedProfileSetupRoute =
   AuthenticatedProfileSetupRouteImport.update({
@@ -58,35 +65,46 @@ const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCheckoutRoute = AuthenticatedCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/food': typeof FoodRoute
+  '/food': typeof FoodRouteWithChildren
+  '/checkout': typeof AuthenticatedCheckoutRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/parcel': typeof AuthenticatedParcelRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/profile-setup': typeof AuthenticatedProfileSetupRoute
+  '/food/$restaurantId': typeof FoodRestaurantIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/food': typeof FoodRoute
+  '/food': typeof FoodRouteWithChildren
+  '/checkout': typeof AuthenticatedCheckoutRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/parcel': typeof AuthenticatedParcelRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/profile-setup': typeof AuthenticatedProfileSetupRoute
+  '/food/$restaurantId': typeof FoodRestaurantIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/food': typeof FoodRoute
+  '/food': typeof FoodRouteWithChildren
+  '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/_authenticated/parcel': typeof AuthenticatedParcelRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/profile-setup': typeof AuthenticatedProfileSetupRoute
+  '/food/$restaurantId': typeof FoodRestaurantIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -94,36 +112,42 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/food'
+    | '/checkout'
     | '/orders'
     | '/parcel'
     | '/profile'
     | '/profile-setup'
+    | '/food/$restaurantId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/food'
+    | '/checkout'
     | '/orders'
     | '/parcel'
     | '/profile'
     | '/profile-setup'
+    | '/food/$restaurantId'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/food'
+    | '/_authenticated/checkout'
     | '/_authenticated/orders'
     | '/_authenticated/parcel'
     | '/_authenticated/profile'
     | '/_authenticated/profile-setup'
+    | '/food/$restaurantId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  FoodRoute: typeof FoodRoute
+  FoodRoute: typeof FoodRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -156,6 +180,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/food/$restaurantId': {
+      id: '/food/$restaurantId'
+      path: '/$restaurantId'
+      fullPath: '/food/$restaurantId'
+      preLoaderRoute: typeof FoodRestaurantIdRouteImport
+      parentRoute: typeof FoodRoute
+    }
     '/_authenticated/profile-setup': {
       id: '/_authenticated/profile-setup'
       path: '/profile-setup'
@@ -184,10 +215,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/checkout': {
+      id: '/_authenticated/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof AuthenticatedCheckoutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCheckoutRoute: typeof AuthenticatedCheckoutRoute
   AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
   AuthenticatedParcelRoute: typeof AuthenticatedParcelRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -195,6 +234,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCheckoutRoute: AuthenticatedCheckoutRoute,
   AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
   AuthenticatedParcelRoute: AuthenticatedParcelRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
@@ -204,11 +244,21 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface FoodRouteChildren {
+  FoodRestaurantIdRoute: typeof FoodRestaurantIdRoute
+}
+
+const FoodRouteChildren: FoodRouteChildren = {
+  FoodRestaurantIdRoute: FoodRestaurantIdRoute,
+}
+
+const FoodRouteWithChildren = FoodRoute._addFileChildren(FoodRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  FoodRoute: FoodRoute,
+  FoodRoute: FoodRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
