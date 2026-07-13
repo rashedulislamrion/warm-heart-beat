@@ -253,14 +253,13 @@ function AdminDashboard() {
                     >
                       <MessageCircle className="h-4 w-4" />
                     </button>
-                    <button
-                      onClick={() => assignSelf("parcel", r.id)}
-                      disabled={r.rider_id === user.id}
-                      className="inline-flex h-9 items-center gap-1 rounded-lg border border-border px-2 text-xs disabled:opacity-60"
-                    >
-                      {r.rider_id === user.id ? <Check className="h-3.5 w-3.5" /> : <UserPlus className="h-3.5 w-3.5" />}
-                      <span className="font-bangla">{r.rider_id === user.id ? "নিয়োগ" : "নিন"}</span>
-                    </button>
+                    <RiderAssign
+                      riders={riders}
+                      value={r.rider_id}
+                      onChange={(v) => assignRider("parcel", r.id, v)}
+                      label={riderLabel(r.rider_id)}
+                    />
+
                     <Select value={r.status} onValueChange={(v) => updateParcelStatus(r.id, v)}>
                       <SelectTrigger className="h-9 w-40 rounded-lg text-xs">
                         <SelectValue />
