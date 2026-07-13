@@ -380,7 +380,8 @@ function DetailsStep({ data, set, schedule, setSchedule }: { data: ParcelState; 
   );
 }
 
-function ReviewStep({ data, charge }: { data: ParcelState; charge: number }) {
+function ReviewStep({ data, charge, schedule }: { data: ParcelState; charge: number; schedule: Schedule }) {
+  const when = formatSchedule(schedule.iso);
   return (
     <div className="space-y-4">
       <div>
@@ -396,6 +397,7 @@ function ReviewStep({ data, charge }: { data: ParcelState; charge: number }) {
         <Row label="যাবে" value={`${data.receiver_hall}, ${data.receiver_block_room}`} />
         <div className="my-3 border-t border-dashed" />
         <Row label="পার্সেল" value={`${itemTypes.find((i) => i.v === data.item_type)?.label} • ${sizes.find((s) => s.v === data.size)?.label}`} />
+        <Row label="সময়" value={schedule.mode === "later" && when ? when : "এখনই"} />
       </div>
 
       <div className="rounded-2xl gradient-primary p-5 text-primary-foreground shadow-soft">
