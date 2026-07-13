@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, Store, Plus, Pencil, Trash2, Clock, Loader2 } from "lucide-react";
+import { ArrowLeft, Store, Plus, Pencil, Trash2, Clock, Loader2, MessageSquare } from "lucide-react";
+import { ReviewList, type ReviewRow } from "@/components/ReviewList";
 
 export const Route = createFileRoute("/_authenticated/restaurant-hub")({
   head: () => ({ meta: [{ title: "রেস্টুরেন্ট ড্যাশবোর্ড — পায়রা" }] }),
@@ -50,7 +51,7 @@ function RestaurantHub() {
   const navigate = useNavigate();
   const [state, setState] = useState<"loading" | "ok" | "denied">("loading");
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [tab, setTab] = useState<"orders" | "menu" | "settings">("orders");
+  const [tab, setTab] = useState<"orders" | "menu" | "reviews" | "settings">("orders");
 
   useEffect(() => {
     (async () => {
@@ -109,7 +110,7 @@ function RestaurantHub() {
           </div>
         </div>
         <div className="mx-auto flex max-w-5xl gap-1 px-4 pb-2">
-          {(["orders", "menu", "settings"] as const).map((t) => (
+          {(["orders", "menu", "reviews", "settings"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -117,7 +118,7 @@ function RestaurantHub() {
                 tab === t ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {t === "orders" ? "অর্ডার" : t === "menu" ? "মেনু" : "সেটিংস"}
+              {t === "orders" ? "অর্ডার" : t === "menu" ? "মেনু" : t === "reviews" ? "রিভিউ" : "সেটিংস"}
             </button>
           ))}
         </div>
@@ -126,6 +127,7 @@ function RestaurantHub() {
       <main className="mx-auto max-w-5xl px-4 py-6">
         {tab === "orders" && <OrdersTab restaurantId={restaurant.id} />}
         {tab === "menu" && <MenuTab restaurantId={restaurant.id} />}
+        {tab === "reviews" && <ReviewsTab restaurantId={restaurant.id} />}
         {tab === "settings" && <SettingsTab restaurant={restaurant} onSaved={(r) => setRestaurant(r)} />}
       </main>
     </div>
@@ -429,6 +431,30 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div>
       <Label className="text-xs">{label}</Label>
       <div className="mt-1">{children}</div>
+    </div>
+  );
+}
+
+function ReviewsTab({ restaurantId }: { restaurantId: string }) {
+  const [reviews, setReviews] = useState<ReviewRow[] | null>(null);
+
+  async function load() {
+    const { data } = await supabase
+      .from("reviews" as any)
+      .select("id, rating, comment, created_at, photo_urls, owner_reply, owner_reply_at, rider_reply, rider_reply_at, user_id")
+      .eq("restaurant_id", restaurantId)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    setReviews(((data ?? []) as unknown) as ReviewRow[]);
+  }
+  useEffect(() => { load(); }, [restaurantId]);
+
+  return (
+    <div className="space-y-4">
+      <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+        <MessageSquare className="h-4 w-4" /> কাস্টমার রিভিউ
+      </h2>
+      <ReviewList reviews={reviews} canReplyOwner onReplied={load} />
     </div>
   );
 }

@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ArrowLeft, Star, Clock, Plus, Minus, ShoppingBag, MessageSquare } from "lucide-react";
 import { cart, useCart, cartCount, cartTotal, type CartItem } from "@/lib/cart";
-import { StarDisplay } from "@/components/Stars";
 import { useFavorites, useCurrentUserId } from "@/lib/favorites";
 import { FavoriteHeart } from "@/components/FavoriteHeart";
+import { ReviewList, type ReviewRow } from "@/components/ReviewList";
 
 export const Route = createFileRoute("/food/$restaurantId")({
   head: ({ loaderData }) => {
@@ -52,12 +52,7 @@ type MenuItem = {
   is_available: boolean;
 };
 
-type Review = {
-  id: string;
-  rating: number;
-  comment: string | null;
-  created_at: string;
-};
+type Review = ReviewRow;
 
 function RestaurantPage() {
   const r = Route.useLoaderData();
@@ -78,11 +73,10 @@ function RestaurantPage() {
       .then(({ data }) => setMenu((data as MenuItem[]) ?? []));
     supabase
       .from("reviews" as any)
-      .select("id, rating, comment, created_at")
+      .select("id, rating, comment, created_at, photo_urls, owner_reply, owner_reply_at, rider_reply, rider_reply_at")
       .eq("restaurant_id", r.id)
-      .not("comment", "is", null)
       .order("created_at", { ascending: false })
-      .limit(20)
+      .limit(50)
       .then(({ data }) => setReviews(((data ?? []) as unknown) as Review[]));
   }, [r.id]);
 
@@ -242,31 +236,7 @@ function RestaurantPage() {
             <MessageSquare className="h-4 w-4" />
             রিভিউ
           </h2>
-          {reviews === null ? (
-            <div className="space-y-3">
-              {[0, 1].map((i) => <Skeleton key={i} className="h-20 w-full rounded-2xl" />)}
-            </div>
-          ) : reviews.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border p-6 text-center">
-              <p className="font-bangla text-sm text-muted-foreground">এখনও কোনো রিভিউ নেই</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {reviews.map((rv) => (
-                <div key={rv.id} className="rounded-2xl border border-border bg-card p-4 shadow-card">
-                  <div className="flex items-center justify-between">
-                    <StarDisplay value={rv.rating} size={14} />
-                    <span className="text-[11px] text-muted-foreground">
-                      {new Date(rv.created_at).toLocaleDateString("bn-BD")}
-                    </span>
-                  </div>
-                  {rv.comment && (
-                    <p className="mt-2 font-bangla text-sm leading-relaxed">{rv.comment}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+          <ReviewList reviews={reviews} />
         </div>
       </div>
 

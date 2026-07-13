@@ -580,10 +580,15 @@ export type Database = {
           id: string
           order_id: string
           order_type: string
+          owner_reply: string | null
+          owner_reply_at: string | null
+          photo_urls: string[]
           rating: number
           restaurant_id: string | null
           rider_id: string | null
           rider_rating: number | null
+          rider_reply: string | null
+          rider_reply_at: string | null
           updated_at: string
           user_id: string
         }
@@ -593,10 +598,15 @@ export type Database = {
           id?: string
           order_id: string
           order_type: string
+          owner_reply?: string | null
+          owner_reply_at?: string | null
+          photo_urls?: string[]
           rating: number
           restaurant_id?: string | null
           rider_id?: string | null
           rider_rating?: number | null
+          rider_reply?: string | null
+          rider_reply_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -606,10 +616,15 @@ export type Database = {
           id?: string
           order_id?: string
           order_type?: string
+          owner_reply?: string | null
+          owner_reply_at?: string | null
+          photo_urls?: string[]
           rating?: number
           restaurant_id?: string | null
           rider_id?: string | null
           rider_rating?: number | null
+          rider_reply?: string | null
+          rider_reply_at?: string | null
           updated_at?: string
           user_id?: string
         }
