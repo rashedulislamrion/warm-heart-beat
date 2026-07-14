@@ -53,7 +53,19 @@ function RiderHub() {
   const [busy, setBusy] = useState<string | null>(null);
   const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
   const [rating, setRating] = useState<{ avg: number; count: number } | null>(null);
+  const [isOnline, setIsOnline] = useState<boolean>(false);
+  const [togglingOnline, setTogglingOnline] = useState(false);
   const { countFor, clearFor, unmute } = useUnreadMessages(user.id);
+
+  async function toggleOnline() {
+    const next = !isOnline;
+    setTogglingOnline(true);
+    const { error } = await (supabase.rpc as any)("set_rider_online", { _online: next });
+    setTogglingOnline(false);
+    if (error) return toast.error(error.message);
+    setIsOnline(next);
+    toast.success(next ? "আপনি এখন অনলাইন" : "আপনি অফলাইন");
+  }
 
   function openChat(target: { type: "food" | "parcel"; id: string; code: string }) {
     clearFor(target.type, target.id);
