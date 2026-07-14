@@ -418,7 +418,39 @@ function CheckoutPage() {
               <span className="font-bangla font-bold">মোট</span>
               <span className="font-extrabold text-primary">৳{total}</span>
             </div>
-            <div className="mt-1 font-bangla text-xs text-muted-foreground">Cash on Delivery</div>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-border bg-card p-5 shadow-card">
+          <h2 className="mb-3 font-bangla text-lg font-extrabold">পেমেন্ট মেথড</h2>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setPayMethod("cod")}
+              className={`rounded-xl border p-3 text-left ${
+                payMethod === "cod" ? "border-primary bg-primary/5" : "border-border"
+              }`}
+            >
+              <div className="text-sm font-bold font-bangla">ক্যাশ অন ডেলিভারি</div>
+              <div className="mt-0.5 text-[11px] text-muted-foreground font-bangla">ডেলিভারির সময় পেমেন্ট</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setPayMethod("wallet")}
+              disabled={walletBalance < total}
+              className={`rounded-xl border p-3 text-left disabled:opacity-50 ${
+                payMethod === "wallet" ? "border-primary bg-primary/5" : "border-border"
+              }`}
+            >
+              <div className="text-sm font-bold font-bangla">ওয়ালেট</div>
+              <div className="mt-0.5 text-[11px] text-muted-foreground">ব্যালেন্স: ৳{walletBalance}</div>
+            </button>
+          </div>
+          {payMethod === "wallet" && walletBalance < total && (
+            <div className="mt-2 text-xs text-destructive font-bangla">
+              যথেষ্ট ব্যালেন্স নেই। <Link to="/wallet" className="underline">টপ-আপ করুন</Link>
+            </div>
+          )}
           </div>
         </div>
 
