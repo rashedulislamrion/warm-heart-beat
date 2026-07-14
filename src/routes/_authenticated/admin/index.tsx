@@ -216,11 +216,12 @@ function AdminDashboard() {
         <p className="text-sm text-muted-foreground">Realtime অর্ডার ম্যানেজমেন্ট</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         <StatCard Icon={TrendingUp} label="মোট অর্ডার" value={stats.totalOrders} />
         <StatCard Icon={Package} label="আজকের অর্ডার" value={stats.todayOrders} />
         <StatCard Icon={UtensilsCrossed} label="অপেক্ষমাণ" value={stats.pending} highlight />
         <StatCard Icon={DollarSign} label="আজকের আয়" value={`৳${stats.revenueToday}`} />
+        <StatCard Icon={Radio} label="অনলাইন রাইডার" value={onlineRiders} highlight />
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
