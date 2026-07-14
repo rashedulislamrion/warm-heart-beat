@@ -103,6 +103,19 @@ function AdminDashboard() {
       setRiders(merged);
     })();
 
+    async function loadOnline() {
+      const { data } = await (supabase.rpc as any)("online_riders_count");
+      setOnlineRiders(Number(data ?? 0));
+    }
+    loadOnline();
+    const chOnline = supabase
+      .channel("admin-online-riders")
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "profiles" }, (payload: any) => {
+        if (payload.new?.is_online !== payload.old?.is_online) loadOnline();
+      })
+      .subscribe();
+
+
     const ch1 = supabase
       .channel("admin-parcels")
       .on("postgres_changes", { event: "*", schema: "public", table: "parcels" }, (payload) => {
