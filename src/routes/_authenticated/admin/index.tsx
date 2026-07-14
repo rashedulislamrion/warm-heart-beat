@@ -132,6 +132,7 @@ function AdminDashboard() {
     return () => {
       supabase.removeChannel(ch1);
       supabase.removeChannel(ch2);
+      supabase.removeChannel(chOnline);
     };
   }, []);
 
