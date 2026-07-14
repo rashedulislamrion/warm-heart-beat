@@ -451,8 +451,8 @@ function CheckoutPage() {
               যথেষ্ট ব্যালেন্স নেই। <Link to="/wallet" className="underline">টপ-আপ করুন</Link>
             </div>
           )}
-          </div>
         </div>
+
 
 
         <Button
