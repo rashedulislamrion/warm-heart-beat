@@ -51,6 +51,18 @@ function useHeaderAuth(): AuthState {
 
 function Home() {
   const auth = useHeaderAuth();
+  const [onlineRiders, setOnlineRiders] = useState<number | null>(null);
+  useEffect(() => {
+    (supabase.rpc as any)("online_riders_count").then(({ data }: { data: any }) => {
+      setOnlineRiders(Number(data ?? 0));
+    });
+    const id = setInterval(() => {
+      (supabase.rpc as any)("online_riders_count").then(({ data }: { data: any }) => {
+        setOnlineRiders(Number(data ?? 0));
+      });
+    }, 30000);
+    return () => clearInterval(id);
+  }, []);
   return (
     <div className="min-h-screen gradient-hero pb-24 md:pb-8">
       {/* Header */}
@@ -107,7 +119,7 @@ function Home() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
           </span>
-          <span className="font-bangla">এখন সক্রিয় রাইডার: <b>১২</b> জন</span>
+          <span className="font-bangla">এখন সক্রিয় রাইডার: <b>{onlineRiders ?? "—"}</b> জন</span>
         </div>
       </section>
 

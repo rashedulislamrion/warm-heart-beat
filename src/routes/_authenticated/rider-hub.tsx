@@ -53,7 +53,19 @@ function RiderHub() {
   const [busy, setBusy] = useState<string | null>(null);
   const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
   const [rating, setRating] = useState<{ avg: number; count: number } | null>(null);
+  const [isOnline, setIsOnline] = useState<boolean>(false);
+  const [togglingOnline, setTogglingOnline] = useState(false);
   const { countFor, clearFor, unmute } = useUnreadMessages(user.id);
+
+  async function toggleOnline() {
+    const next = !isOnline;
+    setTogglingOnline(true);
+    const { error } = await (supabase.rpc as any)("set_rider_online", { _online: next });
+    setTogglingOnline(false);
+    if (error) return toast.error(error.message);
+    setIsOnline(next);
+    toast.success(next ? "আপনি এখন অনলাইন" : "আপনি অফলাইন");
+  }
 
   function openChat(target: { type: "food" | "parcel"; id: string; code: string }) {
     clearFor(target.type, target.id);
@@ -72,6 +84,12 @@ function RiderHub() {
       setState("ok");
     })();
   }, [user.id, navigate]);
+
+  useEffect(() => {
+    if (state !== "ok") return;
+    supabase.from("profiles").select("is_online").eq("id", user.id).maybeSingle()
+      .then(({ data }) => setIsOnline(!!(data as any)?.is_online));
+  }, [state, user.id]);
 
   useEffect(() => {
     if (state !== "ok") return;
@@ -226,6 +244,17 @@ function RiderHub() {
           <span className="ml-1 rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
             <span className="inline-flex items-center gap-1"><Bike className="h-3 w-3" /> rider</span>
           </span>
+          <button
+            onClick={toggleOnline}
+            disabled={togglingOnline}
+            className={`ml-auto inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
+              isOnline ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"
+            } disabled:opacity-60`}
+            aria-label="online toggle"
+          >
+            <span className={`h-2 w-2 rounded-full ${isOnline ? "bg-success animate-pulse" : "bg-muted-foreground/60"}`} />
+            <span className="font-bangla">{isOnline ? "অনলাইন" : "অফলাইন"}</span>
+          </button>
         </div>
       </header>
 

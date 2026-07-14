@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { OrderChat } from "@/components/OrderChat";
 import { toast } from "sonner";
-import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search, MessageCircle, Bike, X } from "lucide-react";
+import { Package, UtensilsCrossed, DollarSign, TrendingUp, Search, MessageCircle, Bike, X, Radio } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
@@ -50,6 +50,7 @@ function AdminDashboard() {
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
   const [riders, setRiders] = useState<Rider[]>([]);
+  const [onlineRiders, setOnlineRiders] = useState<number>(0);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
@@ -102,6 +103,19 @@ function AdminDashboard() {
       setRiders(merged);
     })();
 
+    async function loadOnline() {
+      const { data } = await (supabase.rpc as any)("online_riders_count");
+      setOnlineRiders(Number(data ?? 0));
+    }
+    loadOnline();
+    const chOnline = supabase
+      .channel("admin-online-riders")
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "profiles" }, (payload: any) => {
+        if (payload.new?.is_online !== payload.old?.is_online) loadOnline();
+      })
+      .subscribe();
+
+
     const ch1 = supabase
       .channel("admin-parcels")
       .on("postgres_changes", { event: "*", schema: "public", table: "parcels" }, (payload) => {
@@ -118,6 +132,7 @@ function AdminDashboard() {
     return () => {
       supabase.removeChannel(ch1);
       supabase.removeChannel(ch2);
+      supabase.removeChannel(chOnline);
     };
   }, []);
 
@@ -201,11 +216,12 @@ function AdminDashboard() {
         <p className="text-sm text-muted-foreground">Realtime অর্ডার ম্যানেজমেন্ট</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         <StatCard Icon={TrendingUp} label="মোট অর্ডার" value={stats.totalOrders} />
         <StatCard Icon={Package} label="আজকের অর্ডার" value={stats.todayOrders} />
         <StatCard Icon={UtensilsCrossed} label="অপেক্ষমাণ" value={stats.pending} highlight />
         <StatCard Icon={DollarSign} label="আজকের আয়" value={`৳${stats.revenueToday}`} />
+        <StatCard Icon={Radio} label="অনলাইন রাইডার" value={onlineRiders} highlight />
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
