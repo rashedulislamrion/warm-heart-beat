@@ -372,6 +372,8 @@ export type Database = {
           full_name: string | null
           hall: string | null
           id: string
+          is_online: boolean
+          online_at: string | null
           phone: string | null
           profile_complete: boolean
           referral_code: string
@@ -385,6 +387,8 @@ export type Database = {
           full_name?: string | null
           hall?: string | null
           id: string
+          is_online?: boolean
+          online_at?: string | null
           phone?: string | null
           profile_complete?: boolean
           referral_code: string
@@ -398,6 +402,8 @@ export type Database = {
           full_name?: string | null
           hall?: string | null
           id?: string
+          is_online?: boolean
+          online_at?: string | null
           phone?: string | null
           profile_complete?: boolean
           referral_code?: string
@@ -826,6 +832,7 @@ export type Database = {
       my_restaurant_id: { Args: never; Returns: string }
       my_unread_notification_count: { Args: never; Returns: number }
       my_wallet_balance: { Args: never; Returns: number }
+      online_riders_count: { Args: never; Returns: number }
       pay_with_wallet: {
         Args: { _amount: number; _order_id: string; _order_type: string }
         Returns: number
@@ -886,6 +893,7 @@ export type Database = {
           rider_id: string
         }[]
       }
+      set_rider_online: { Args: { _online: boolean }; Returns: undefined }
       track_order: {
         Args: { _code: string }
         Returns: {
