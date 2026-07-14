@@ -50,6 +50,7 @@ function AdminDashboard() {
   const [parcels, setParcels] = useState<Parcel[] | null>(null);
   const [foods, setFoods] = useState<FoodOrder[] | null>(null);
   const [riders, setRiders] = useState<Rider[]>([]);
+  const [onlineRiders, setOnlineRiders] = useState<number>(0);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [chat, setChat] = useState<{ type: "food" | "parcel"; id: string; code: string } | null>(null);
