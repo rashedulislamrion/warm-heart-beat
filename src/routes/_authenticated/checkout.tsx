@@ -114,6 +114,11 @@ function CheckoutPage() {
       }
     }
 
+    if (payMethod === "wallet" && walletBalance < total) {
+      setSubmitting(false);
+      return toast.error("ওয়ালেটে যথেষ্ট ব্যালেন্স নেই");
+    }
+
     setSubmitting(true);
 
     // Re-validate availability & pricing right before placing order
