@@ -87,6 +87,12 @@ function RiderHub() {
 
   useEffect(() => {
     if (state !== "ok") return;
+    supabase.from("profiles").select("is_online").eq("id", user.id).maybeSingle()
+      .then(({ data }) => setIsOnline(!!(data as any)?.is_online));
+  }, [state, user.id]);
+
+  useEffect(() => {
+    if (state !== "ok") return;
     supabase.from("parcels")
       .select("id, order_code, status, delivery_charge, sender_name, sender_hall, sender_phone, receiver_name, receiver_hall, receiver_phone, item_type, size, created_at, rider_id, scheduled_for")
       .or(`rider_id.eq.${user.id},and(rider_id.is.null,status.eq.pending)`)
