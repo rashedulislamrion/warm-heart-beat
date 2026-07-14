@@ -185,6 +185,18 @@ function CheckoutPage() {
       if (ce) console.warn("credits redeem failed", ce.message);
     }
 
+    if (payMethod === "wallet" && total > 0) {
+      const { error: we } = await (supabase.rpc as any)("pay_with_wallet", {
+        _order_type: "food",
+        _order_id: data.id,
+        _amount: total,
+      });
+      if (we) {
+        setSubmitting(false);
+        return toast.error(we.message === "insufficient_balance" ? "ওয়ালেটে যথেষ্ট ব্যালেন্স নেই" : we.message);
+      }
+    }
+
     setSubmitting(false);
     cart.clear();
     setOrderCode(data.order_code);
