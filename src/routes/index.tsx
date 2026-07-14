@@ -51,6 +51,18 @@ function useHeaderAuth(): AuthState {
 
 function Home() {
   const auth = useHeaderAuth();
+  const [onlineRiders, setOnlineRiders] = useState<number | null>(null);
+  useEffect(() => {
+    (supabase.rpc as any)("online_riders_count").then(({ data }: { data: any }) => {
+      setOnlineRiders(Number(data ?? 0));
+    });
+    const id = setInterval(() => {
+      (supabase.rpc as any)("online_riders_count").then(({ data }: { data: any }) => {
+        setOnlineRiders(Number(data ?? 0));
+      });
+    }, 30000);
+    return () => clearInterval(id);
+  }, []);
   return (
     <div className="min-h-screen gradient-hero pb-24 md:pb-8">
       {/* Header */}
