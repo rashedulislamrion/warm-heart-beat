@@ -49,6 +49,8 @@ function CheckoutPage() {
   const [restaurantOrigin, setRestaurantOrigin] = useState<string>(DEFAULT_ORIGIN);
   const [orderCode, setOrderCode] = useState<string | null>(null);
   const [schedule, setSchedule] = useState<Schedule>({ mode: "now", iso: null });
+  const [payMethod, setPayMethod] = useState<"cod" | "wallet">("cod");
+  const [walletBalance, setWalletBalance] = useState<number>(0);
   const [discounts, setDiscounts] = useState<{ promoCode: string | null; promoDiscount: number; creditsUsed: number }>({
     promoCode: null,
     promoDiscount: 0,
@@ -58,6 +60,12 @@ function CheckoutPage() {
     (v: { promoCode: string | null; promoDiscount: number; creditsUsed: number }) => setDiscounts(v),
     [],
   );
+
+  useEffect(() => {
+    (supabase.rpc as any)("my_wallet_balance").then(({ data }: any) => {
+      setWalletBalance(typeof data === "number" ? data : 0);
+    });
+  }, []);
 
   useEffect(() => {
     (async () => {
