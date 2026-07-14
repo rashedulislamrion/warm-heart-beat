@@ -244,6 +244,17 @@ function RiderHub() {
           <span className="ml-1 rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
             <span className="inline-flex items-center gap-1"><Bike className="h-3 w-3" /> rider</span>
           </span>
+          <button
+            onClick={toggleOnline}
+            disabled={togglingOnline}
+            className={`ml-auto inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
+              isOnline ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"
+            } disabled:opacity-60`}
+            aria-label="online toggle"
+          >
+            <span className={`h-2 w-2 rounded-full ${isOnline ? "bg-success animate-pulse" : "bg-muted-foreground/60"}`} />
+            <span className="font-bangla">{isOnline ? "অনলাইন" : "অফলাইন"}</span>
+          </button>
         </div>
       </header>
 
