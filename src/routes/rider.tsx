@@ -16,11 +16,13 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 export const Route = createFileRoute("/rider")({
   head: () => ({
     meta: [
-      { title: "রাইডার হোন — DearDash" },
-      { name: "description", content: "DearDash-এ রাইডার হিসেবে যোগ দিন। ক্লাসের ফাঁকে আয় করুন, ক্যাম্পাসে সাহায্য করুন।" },
-      { property: "og:title", content: "DearDash-এ রাইডার হোন" },
-      { property: "og:description", content: "CU'র নিজস্ব ডেলিভারি প্ল্যাটফর্মে যোগ দিন" },
+      { title: "Become a Rider — DearDash" },
+      { name: "description", content: "Join DearDash as a campus rider. Earn between classes delivering food and parcels with care." },
+      { property: "og:title", content: "Become a Rider — DearDash" },
+      { property: "og:description", content: "Join DearDash as a campus rider. Earn between classes delivering food and parcels with care." },
+      { property: "og:url", content: "https://warm-heart-beat.lovable.app/rider" },
     ],
+    links: [{ rel: "canonical", href: "https://warm-heart-beat.lovable.app/rider" }],
   }),
   component: RiderApply,
 });
