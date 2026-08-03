@@ -11,11 +11,13 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 export const Route = createFileRoute("/track")({
   head: () => ({
     meta: [
-      { title: "অর্ডার ট্র্যাক করুন — DearDash" },
-      { name: "description", content: "আপনার অর্ডার কোড দিয়ে পার্সেল বা খাবার অর্ডারের বর্তমান অবস্থা দেখুন।" },
-      { property: "og:title", content: "অর্ডার ট্র্যাক করুন — DearDash" },
-      { property: "og:description", content: "DearDash অর্ডার ট্র্যাকিং" },
+      { title: "Track Your Order — DearDash" },
+      { name: "description", content: "Track your DearDash food or parcel delivery in real time with your order code." },
+      { property: "og:title", content: "Track Your Order — DearDash" },
+      { property: "og:description", content: "Track your DearDash food or parcel delivery in real time with your order code." },
+      { property: "og:url", content: "https://warm-heart-beat.lovable.app/track" },
     ],
+    links: [{ rel: "canonical", href: "https://warm-heart-beat.lovable.app/track" }],
   }),
   component: TrackPage,
 });

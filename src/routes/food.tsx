@@ -13,9 +13,13 @@ import { FavoriteHeart } from "@/components/FavoriteHeart";
 export const Route = createFileRoute("/food")({
   head: () => ({
     meta: [
-      { title: "খাবার অর্ডার — DearDash" },
-      { name: "description", content: "CU ক্যাম্পাসের প্রিয় রেস্টুরেন্ট থেকে খাবার অর্ডার করুন।" },
+      { title: "Food Delivery on Campus — DearDash" },
+      { name: "description", content: "Browse campus restaurants and order food with DearDash. Fast. Friendly. Yours." },
+      { property: "og:title", content: "Food Delivery on Campus — DearDash" },
+      { property: "og:description", content: "Browse campus restaurants and order food with DearDash. Fast. Friendly. Yours." },
+      { property: "og:url", content: "https://warm-heart-beat.lovable.app/food" },
     ],
+    links: [{ rel: "canonical", href: "https://warm-heart-beat.lovable.app/food" }],
   }),
   component: FoodLayout,
 });
