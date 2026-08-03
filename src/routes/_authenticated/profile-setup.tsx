@@ -15,7 +15,7 @@ const searchSchema = z.object({ redirect: z.string().optional() });
 
 export const Route = createFileRoute("/_authenticated/profile-setup")({
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "প্রোফাইল সম্পূর্ণ করুন — পায়রা" }] }),
+  head: () => ({ meta: [{ title: "প্রোফাইল সম্পূর্ণ করুন — DearDash" }] }),
   component: ProfileSetup,
 });
 

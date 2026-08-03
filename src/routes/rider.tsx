@@ -16,9 +16,9 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 export const Route = createFileRoute("/rider")({
   head: () => ({
     meta: [
-      { title: "রাইডার হোন — পায়রা" },
-      { name: "description", content: "পায়রায় রাইডার হিসেবে যোগ দিন। ক্লাসের ফাঁকে আয় করুন, ক্যাম্পাসে সাহায্য করুন।" },
-      { property: "og:title", content: "পায়রায় রাইডার হোন" },
+      { title: "রাইডার হোন — DearDash" },
+      { name: "description", content: "DearDash-এ রাইডার হিসেবে যোগ দিন। ক্লাসের ফাঁকে আয় করুন, ক্যাম্পাসে সাহায্য করুন।" },
+      { property: "og:title", content: "DearDash-এ রাইডার হোন" },
       { property: "og:description", content: "CU'র নিজস্ব ডেলিভারি প্ল্যাটফর্মে যোগ দিন" },
     ],
   }),
@@ -184,7 +184,7 @@ function RiderApply() {
           <span className="font-bangla">রিক্রুটমেন্ট চলছে</span>
         </div>
         <h1 className="mt-3 font-bangla text-3xl font-extrabold md:text-4xl">
-          পায়রায় <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">রাইডার হোন</span>
+          DearDash-এ <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">রাইডার হোন</span>
         </h1>
         <p className="mt-2 font-bangla text-muted-foreground">
           ক্লাসের ফাঁকে আয় করুন, বন্ধুদের সাহায্য করুন

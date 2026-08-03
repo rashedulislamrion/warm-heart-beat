@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/parcel")({
-  head: () => ({ meta: [{ title: "পার্সেল পাঠান — পায়রা" }] }),
+  head: () => ({ meta: [{ title: "পার্সেল পাঠান — DearDash" }] }),
   component: ParcelFlow,
 });
 
@@ -433,7 +433,7 @@ function Row({ label, value }: { label: string; value: string }) {
 
 function SuccessScreen({ orderCode, charge }: { orderCode: string; charge: number }) {
   const navigate = useNavigate();
-  const waMsg = `আমি পায়রা দিয়ে একটি পার্সেল অর্ডার করেছি। Order ID: ${orderCode}`;
+  const waMsg = `আমি DearDash দিয়ে একটি পার্সেল অর্ডার করেছি। Order ID: ${orderCode}`;
 
   return (
     <div className="grid min-h-screen place-items-center gradient-hero px-4 pb-24">

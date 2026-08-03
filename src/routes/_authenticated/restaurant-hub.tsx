@@ -14,7 +14,7 @@ import { ArrowLeft, Store, Plus, Pencil, Trash2, Clock, Loader2, MessageSquare }
 import { ReviewList, type ReviewRow } from "@/components/ReviewList";
 
 export const Route = createFileRoute("/_authenticated/restaurant-hub")({
-  head: () => ({ meta: [{ title: "রেস্টুরেন্ট ড্যাশবোর্ড — পায়রা" }] }),
+  head: () => ({ meta: [{ title: "রেস্টুরেন্ট ড্যাশবোর্ড — DearDash" }] }),
   component: RestaurantHub,
 });
 

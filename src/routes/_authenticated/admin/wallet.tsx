@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Wallet, Check, X, ArrowDownToLine } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/wallet")({
-  head: () => ({ meta: [{ title: "ওয়ালেট — পায়রা Admin" }] }),
+  head: () => ({ meta: [{ title: "ওয়ালেট — DearDash Admin" }] }),
   component: AdminWalletPage,
 });
 

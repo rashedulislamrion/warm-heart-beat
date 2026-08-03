@@ -9,7 +9,7 @@ import { Wallet, ArrowLeft, Plus, ArrowDownToLine, Clock, Check, X } from "lucid
 import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/_authenticated/wallet")({
-  head: () => ({ meta: [{ title: "ওয়ালেট — পায়রা" }] }),
+  head: () => ({ meta: [{ title: "ওয়ালেট — DearDash" }] }),
   component: WalletPage,
 });
 

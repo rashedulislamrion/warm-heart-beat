@@ -5,7 +5,7 @@ export function Logo({ className = "" }: { className?: string }) {
         🕊️
       </span>
       <span className="font-bangla text-xl font-extrabold tracking-tight text-foreground">
-        পায়রা
+        DearDash
       </span>
     </div>
   );

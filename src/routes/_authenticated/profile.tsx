@@ -11,7 +11,7 @@ import { ArrowLeft, LogOut, Pencil, User as UserIcon, Phone, MapPin, Shield, Gif
 import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "প্রোফাইল — পায়রা" }] }),
+  head: () => ({ meta: [{ title: "প্রোফাইল — DearDash" }] }),
   component: ProfilePage,
 });
 

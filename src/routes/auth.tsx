@@ -18,7 +18,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "লগইন — পায়রা" }] }),
+  head: () => ({ meta: [{ title: "লগইন — DearDash" }] }),
   component: AuthPage,
 });
 
@@ -138,7 +138,7 @@ function AuthPage() {
             {mode === "signin" ? "স্বাগতম!" : "অ্যাকাউন্ট তৈরি করুন"}
           </h1>
           <p className="mt-1 font-bangla text-sm text-muted-foreground">
-            {mode === "signin" ? "পায়রায় লগইন করুন" : "CU'র ডেলিভারি প্ল্যাটফর্মে যোগ দিন"}
+            {mode === "signin" ? "DearDash-এ লগইন করুন" : "CU'র ডেলিভারি প্ল্যাটফর্মে যোগ দিন"}
           </p>
 
           <Button

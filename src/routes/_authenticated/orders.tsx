@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 export const Route = createFileRoute("/_authenticated/orders")({
-  head: () => ({ meta: [{ title: "আমার অর্ডার — পায়রা" }] }),
+  head: () => ({ meta: [{ title: "আমার অর্ডার — DearDash" }] }),
   component: OrdersPage,
 });
 

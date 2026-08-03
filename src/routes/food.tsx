@@ -13,7 +13,7 @@ import { FavoriteHeart } from "@/components/FavoriteHeart";
 export const Route = createFileRoute("/food")({
   head: () => ({
     meta: [
-      { title: "খাবার অর্ডার — পায়রা" },
+      { title: "খাবার অর্ডার — DearDash" },
       { name: "description", content: "CU ক্যাম্পাসের প্রিয় রেস্টুরেন্ট থেকে খাবার অর্ডার করুন।" },
     ],
   }),
