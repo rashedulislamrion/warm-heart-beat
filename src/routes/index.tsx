@@ -9,9 +9,13 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "DearDash — CU'র নিজস্ব ডেলিভারি প্ল্যাটফর্ম" },
-      { name: "description", content: "চট্টগ্রাম বিশ্ববিদ্যালয়ের খাবার ও পার্সেল ডেলিভারি। ছাত্রদের দ্বারা, ছাত্রদের জন্য।" },
+      { title: "DearDash — Dear to you. Dashed to you." },
+      { name: "description", content: "Order food and send parcels across campus with DearDash. Fast. Friendly. Yours — your campus delivery, delivered with care." },
+      { property: "og:title", content: "DearDash — Dear to you. Dashed to you." },
+      { property: "og:description", content: "Order food and send parcels across campus with DearDash. Fast. Friendly. Yours." },
+      { property: "og:url", content: "https://warm-heart-beat.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://warm-heart-beat.lovable.app/" }],
   }),
   component: Home,
 });
