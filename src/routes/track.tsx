@@ -11,10 +11,10 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 export const Route = createFileRoute("/track")({
   head: () => ({
     meta: [
-      { title: "অর্ডার ট্র্যাক করুন — পায়রা" },
+      { title: "অর্ডার ট্র্যাক করুন — DearDash" },
       { name: "description", content: "আপনার অর্ডার কোড দিয়ে পার্সেল বা খাবার অর্ডারের বর্তমান অবস্থা দেখুন।" },
-      { property: "og:title", content: "অর্ডার ট্র্যাক করুন — পায়রা" },
-      { property: "og:description", content: "পায়রা অর্ডার ট্র্যাকিং" },
+      { property: "og:title", content: "অর্ডার ট্র্যাক করুন — DearDash" },
+      { property: "og:description", content: "DearDash অর্ডার ট্র্যাকিং" },
     ],
   }),
   component: TrackPage,

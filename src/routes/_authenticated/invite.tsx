@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Copy, Share2, Gift, Wallet, Users, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/invite")({
-  head: () => ({ meta: [{ title: "বন্ধু আনুন — পায়রা" }] }),
+  head: () => ({ meta: [{ title: "বন্ধু আনুন — DearDash" }] }),
   component: InvitePage,
 });
 
@@ -60,9 +60,9 @@ function InvitePage() {
 
   async function share() {
     if (!code) return;
-    const text = `পায়রা'তে যোগ দিন — আমার রেফারেল কোড ব্যবহার করুন: ${code}\n${shareUrl}`;
+    const text = `DearDash-এ যোগ দিন — আমার রেফারেল কোড ব্যবহার করুন: ${code}\n${shareUrl}`;
     if (typeof navigator !== "undefined" && (navigator as any).share) {
-      try { await (navigator as any).share({ title: "পায়রা", text, url: shareUrl }); } catch {}
+      try { await (navigator as any).share({ title: "DearDash", text, url: shareUrl }); } catch {}
     } else {
       copy(text, "লিংক");
     }

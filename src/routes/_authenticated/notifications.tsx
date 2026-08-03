@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { PushNotificationToggle } from "@/components/PushNotificationToggle";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
-  head: () => ({ meta: [{ title: "নোটিফিকেশন — পায়রা" }] }),
+  head: () => ({ meta: [{ title: "নোটিফিকেশন — DearDash" }] }),
   component: NotificationsPage,
 });
 

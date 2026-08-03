@@ -19,7 +19,7 @@ import { SchedulePicker, formatSchedule, type Schedule } from "@/components/Sche
 import { ArrowLeft, Clock, Loader2, Minus, Plus, PartyPopper, ShoppingBag, Trash2, Copy } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
-  head: () => ({ meta: [{ title: "চেকআউট — পায়রা" }] }),
+  head: () => ({ meta: [{ title: "চেকআউট — DearDash" }] }),
   component: CheckoutPage,
 });
 

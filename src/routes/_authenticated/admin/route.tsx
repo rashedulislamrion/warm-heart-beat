@@ -6,7 +6,7 @@ import { Loader2, LayoutDashboard, Store, ArrowLeft, Bike, BarChart3, Wallet } f
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({ meta: [{ title: "অ্যাডমিন — পায়রা" }] }),
+  head: () => ({ meta: [{ title: "অ্যাডমিন — DearDash" }] }),
   component: AdminLayout,
 });
 

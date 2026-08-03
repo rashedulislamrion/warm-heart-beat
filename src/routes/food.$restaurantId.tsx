@@ -16,7 +16,7 @@ export const Route = createFileRoute("/food/$restaurantId")({
   head: ({ loaderData }) => {
     const d = loaderData as { name?: string } | undefined;
     return {
-      meta: [{ title: d?.name ? `${d.name} — পায়রা` : "রেস্টুরেন্ট — পায়রা" }],
+      meta: [{ title: d?.name ? `${d.name} — DearDash` : "রেস্টুরেন্ট — DearDash" }],
     };
   },
   loader: async ({ params }) => {

@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "পায়রা — CU'র নিজস্ব ডেলিভারি প্ল্যাটফর্ম" },
+      { title: "DearDash — CU'র নিজস্ব ডেলিভারি প্ল্যাটফর্ম" },
       { name: "description", content: "চট্টগ্রাম বিশ্ববিদ্যালয়ের খাবার ও পার্সেল ডেলিভারি। ছাত্রদের দ্বারা, ছাত্রদের জন্য।" },
     ],
   }),
@@ -226,7 +226,7 @@ function Home() {
       </section>
 
       <p className="mt-12 text-center font-bangla text-xs text-muted-foreground">
-        © পায়রা {new Date().getFullYear()} • হটলাইন: 01400065088
+        © DearDash {new Date().getFullYear()} • হটলাইন: 01400065088
       </p>
 
       <FloatingActions />

@@ -4,8 +4,8 @@ self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
 
 self.addEventListener('push', (event) => {
   let payload = {};
-  try { payload = event.data ? event.data.json() : {}; } catch { payload = { title: 'পায়রা', body: event.data ? event.data.text() : '' }; }
-  const title = payload.title || 'পায়রা';
+  try { payload = event.data ? event.data.json() : {}; } catch { payload = { title: 'DearDash', body: event.data ? event.data.text() : '' }; }
+  const title = payload.title || 'DearDash';
   const options = {
     body: payload.body || '',
     icon: payload.icon || '/icon-192.png',

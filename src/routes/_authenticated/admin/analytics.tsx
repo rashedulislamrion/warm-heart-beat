@@ -17,7 +17,7 @@ import {
 import { TrendingUp, DollarSign, UtensilsCrossed, Package, Trophy, Clock, Bike, XCircle, Timer, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/analytics")({
-  head: () => ({ meta: [{ title: "Analytics — পায়রা Admin" }] }),
+  head: () => ({ meta: [{ title: "Analytics — DearDash Admin" }] }),
   component: AnalyticsPage,
 });
 
