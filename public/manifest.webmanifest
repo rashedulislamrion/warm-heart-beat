@@ -1,7 +1,7 @@
 {
-  "name": "DearDash — CU Delivery",
+  "name": "DearDash — Dear to you. Dashed to you.",
   "short_name": "DearDash",
-  "description": "চট্টগ্রাম বিশ্ববিদ্যালয়ের ছাত্রদের জন্য খাবার ও পার্সেল ডেলিভারি।",
+  "description": "DearDash delivers food and parcels across campus. Fast. Friendly. Yours.",
   "start_url": "/",
   "scope": "/",
   "id": "/",
