@@ -99,10 +99,6 @@ function Home() {
 
       {/* Hero */}
       <section className="mx-auto max-w-6xl px-4 pt-10 text-center md:px-8 md:pt-16">
-        <div className="animate-fade-up mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary">
-          <Sparkles className="h-3.5 w-3.5" />
-          <span className="font-bangla">চট্টগ্রাম বিশ্ববিদ্যালয়ের ছাত্রদের জন্য</span>
-        </div>
         <h1 className="animate-fade-up font-bangla text-4xl font-extrabold leading-tight tracking-tight md:text-6xl" style={{ animationDelay: "60ms" }}>
           ক্যাম্পাসে যেকোনো কিছু <br />
           <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
