@@ -105,9 +105,6 @@ function Home() {
             মিনিটেই পৌঁছে দিন
           </span>
         </h1>
-        <p className="animate-fade-up mx-auto mt-4 max-w-xl font-bangla text-base text-muted-foreground md:text-lg" style={{ animationDelay: "120ms" }}>
-          CU'র নিজস্ব ডেলিভারি প্ল্যাটফর্ম • Students Delivering for Students
-        </p>
 
         {/* Live riders */}
         <div className="animate-fade-up mx-auto mt-6 inline-flex items-center gap-2 rounded-full bg-success/10 px-4 py-2 text-sm font-medium text-success" style={{ animationDelay: "180ms" }}>
