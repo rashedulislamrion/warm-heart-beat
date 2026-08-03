@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { UtensilsCrossed, Package, ArrowRight, Sparkles, Clock, MapPin, Shield, Search, Bike, LayoutDashboard, User as UserIcon } from "lucide-react";
+import { UtensilsCrossed, Package, ArrowRight, Clock, MapPin, Shield, Search, Bike, LayoutDashboard, User as UserIcon } from "lucide-react";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FloatingActions } from "@/components/FloatingActions";
 import { Logo } from "@/components/Logo";
