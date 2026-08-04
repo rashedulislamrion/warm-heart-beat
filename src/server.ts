@@ -1,3 +1,4 @@
+import "./lib/external-supabase-env";
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";

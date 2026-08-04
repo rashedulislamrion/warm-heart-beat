@@ -1,3 +1,4 @@
+import "./lib/external-supabase-env";
 import { createStart, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
